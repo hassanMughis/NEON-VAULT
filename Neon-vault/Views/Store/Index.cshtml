@@ -1,0 +1,126 @@
+@model List<Neon_vault.Models.Game>
+@{
+    ViewData["Title"] = "Store";
+}
+
+@section Styles {
+<style>
+    .game-card { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s; }
+    .game-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 40px rgba(221, 183, 255, 0.15); }
+    .game-card:hover .card-overlay { opacity: 1; }
+    .shelf-scroll { scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+    .shelf-scroll::-webkit-scrollbar { display: none; }
+    .hero-banner { animation: fadeInUp 0.8s ease-out; }
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .sidebar-link { transition: all 0.2s; }
+    .sidebar-link:hover { background: rgba(221, 183, 255, 0.08); color: #DDB7FF; padding-left: 1.25rem; }
+    .sidebar-link.active { background: rgba(221, 183, 255, 0.12); color: #DDB7FF; border-left: 3px solid #DDB7FF; }
+</style>
+}
+
+<div class="flex min-h-[calc(100vh-64px)]">
+    <!-- Sidebar -->
+    <aside class="w-56 bg-navy-deep border-r border-slate-800/50 flex flex-col py-6 px-0 shrink-0 hidden lg:flex">
+        <div class="px-5 mb-6">
+            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Browse</h3>
+            <nav class="flex flex-col gap-1">
+                <a href="/Store" class="sidebar-link active flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    Home
+                </a>
+                <a href="/Store/AllGames" class="sidebar-link flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                    All Games
+                </a>
+            </nav>
+        </div>
+        <div class="px-5 mb-6">
+            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Categories</h3>
+            <nav class="flex flex-col gap-1">
+                @foreach (var genre in Model.Select(g => g.Genre).Distinct().OrderBy(g => g))
+                {
+                    <a href="/Store/AllGames?genre=@genre" class="sidebar-link flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg">
+                        <span class="w-2 h-2 rounded-full bg-accent/60"></span> @genre
+                    </a>
+                }
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto">
+        <!-- Hero Banner -->
+        <section class="hero-banner relative mx-6 mt-6 rounded-2xl overflow-hidden h-[340px] group cursor-pointer">
+            <img src="/images/hero_banner.png" alt="Featured Game" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute inset-0 bg-gradient-to-r from-navy/90 via-navy/50 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-transparent"></div>
+            @if (Model.Any())
+            {
+                var featured = Model.OrderByDescending(g => g.Price).First();
+                <div class="absolute bottom-0 left-0 p-8 z-10 max-w-lg">
+                    <span class="inline-block bg-accent/20 border border-accent/30 text-accent text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">🔥 Featured</span>
+                    <h1 class="font-sora text-3xl font-extrabold text-white leading-tight mb-2">@featured.Title</h1>
+                    <p class="text-sm text-brand/60 leading-relaxed mb-4">@featured.Description.Substring(0, Math.Min(featured.Description.Length, 120))...</p>
+                    <div class="flex items-center gap-3">
+                        <a href="/Store/ProductDetails/@featured.Id" class="bg-accent text-navy-deep font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-accent-dark hover:text-white transition-all hover:shadow-[0_0_20px_rgba(221,183,255,0.4)]">Buy Now — $@featured.Price.ToString("F2")</a>
+                        <form method="post" action="/Cart/AddToCart" class="inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="gameId" value="@featured.Id" />
+                            <input type="hidden" name="returnUrl" value="/Store" />
+                            <button type="submit" class="bg-white/10 border border-white/20 text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-white/20 transition">🛒 Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <!-- All Games Shelf -->
+        <section class="px-6 mt-8">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="font-outfit text-xl font-bold text-white">🎮 Our Catalog</h2>
+                <a href="/Store/AllGames" class="text-sm text-accent hover:text-accent-dark transition flex items-center gap-1">
+                    View All <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+                </a>
+            </div>
+            <div class="shelf-scroll flex gap-4 overflow-x-auto pb-2">
+                @foreach (var game in Model)
+                {
+                    <div class="game-card relative bg-navy-deep border border-slate-800/50 rounded-xl overflow-hidden min-w-[200px] w-[200px] flex flex-col group">
+                        <a href="/Store/ProductDetails/@game.Id" class="relative h-[260px] overflow-hidden block">
+                            <img src="@game.CoverImageUrl" alt="@game.Title" class="w-full h-full object-cover" />
+                            <div class="card-overlay absolute inset-0 bg-gradient-to-t from-navy/90 to-transparent opacity-0 transition-opacity duration-300 flex items-end p-3">
+                                <span class="text-xs text-accent font-semibold">View Details →</span>
+                            </div>
+                        </a>
+                        <div class="p-3 flex flex-col gap-1.5 flex-1">
+                            <span class="text-[10px] text-accent/80 font-semibold uppercase tracking-wider">@game.Genre</span>
+                            <h3 class="text-sm font-semibold text-white truncate">@game.Title</h3>
+                            <span class="text-sm font-bold text-white">$@game.Price.ToString("F2")</span>
+                            <form method="post" action="/Cart/AddToCart" class="mt-auto">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="gameId" value="@game.Id" />
+                                <input type="hidden" name="returnUrl" value="/Store" />
+                                <button type="submit" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-1.5 rounded-lg hover:bg-accent hover:text-navy-deep transition mt-1">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Special Offers Banner -->
+        <section class="px-6 mt-8 mb-10">
+            <div class="relative bg-gradient-to-r from-purple-900/40 via-accent/10 to-purple-900/40 border border-accent/20 rounded-2xl p-8 overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <span class="text-accent text-xs font-bold uppercase tracking-widest">⚡ Browse Our Collection</span>
+                        <h2 class="font-sora text-2xl font-extrabold text-white mt-2">@Model.Count Games Available</h2>
+                        <p class="text-sm text-brand/50 mt-1">Discover your next favorite game in our curated collection.</p>
+                    </div>
+                    <a href="/Store/AllGames" class="bg-accent text-navy-deep font-bold text-sm px-8 py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all shrink-0">Browse All</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

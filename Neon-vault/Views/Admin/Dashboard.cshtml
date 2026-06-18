@@ -1,0 +1,86 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    int totalGames = ViewBag.TotalGames;
+    int totalOrders = ViewBag.TotalOrders;
+    decimal totalRevenue = ViewBag.TotalRevenue;
+    var recentOrders = ViewBag.RecentOrders as List<Neon_vault.Models.Order> ?? new List<Neon_vault.Models.Order>();
+}
+
+<div class="flex min-h-screen">
+    <!-- Admin Sidebar -->
+    @await Html.PartialAsync("_AdminSidebar", "Dashboard")
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto">
+        <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-navy/50 sticky top-0 z-50">
+            <h1 class="font-outfit text-lg font-bold text-white">Dashboard</h1>
+            <a href="/Admin/Logout" class="text-xs text-brand/40 hover:text-red-400 transition">Logout →</a>
+        </header>
+
+        <div class="p-6">
+            <!-- Metrics -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-navy border border-slate-800/50 rounded-xl p-5">
+                    <span class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Games</span>
+                    <div class="text-2xl font-extrabold text-white font-sora mt-2">@totalGames</div>
+                </div>
+                <div class="bg-navy border border-slate-800/50 rounded-xl p-5">
+                    <span class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Orders</span>
+                    <div class="text-2xl font-extrabold text-white font-sora mt-2">@totalOrders</div>
+                </div>
+                <div class="bg-navy border border-slate-800/50 rounded-xl p-5">
+                    <span class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Revenue</span>
+                    <div class="text-2xl font-extrabold text-accent font-sora mt-2">$@totalRevenue.ToString("F2")</div>
+                </div>
+            </div>
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="bg-accent/10 border border-accent/30 text-accent text-sm px-4 py-2 rounded-lg mb-4">@TempData["Message"]</div>
+            }
+
+            <!-- Recent Orders -->
+            <div class="bg-navy border border-slate-800/50 rounded-xl p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="font-outfit text-base font-bold text-white">📋 Recent Orders</h2>
+                    <a href="/Admin/Orders" class="text-xs text-accent hover:underline">View All →</a>
+                </div>
+                @if (!recentOrders.Any())
+                {
+                    <p class="text-sm text-brand/40 text-center py-8">No orders yet.</p>
+                }
+                else
+                {
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-800/50">
+                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Order ID</th>
+                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Customer</th>
+                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Items</th>
+                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Amount</th>
+                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Date</th>
+                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in recentOrders)
+                                {
+                                    <tr class="border-b border-slate-800/20 hover:bg-white/[0.02] transition">
+                                        <td class="py-3 px-4 text-xs font-mono text-accent">#@order.Id.ToString().Substring(0, 8).ToUpper()</td>
+                                        <td class="py-3 px-4 text-xs text-white font-semibold">@order.CustomerName</td>
+                                        <td class="py-3 px-4 text-xs text-brand/60">@order.OrderItems.Count game(s)</td>
+                                        <td class="py-3 px-4 text-xs text-white font-semibold">$@order.TotalAmount.ToString("F2")</td>
+                                        <td class="py-3 px-4 text-xs text-brand/60">@order.OrderDate.ToString("MMM dd, HH:mm")</td>
+                                        <td class="py-3 px-4"><a href="/Admin/OrderDetails/@order.Id" class="text-xs text-accent hover:underline">View →</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

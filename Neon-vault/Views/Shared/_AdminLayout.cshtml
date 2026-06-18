@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? $"{ViewData["Title"]} - Neon Vault Admin" : "Neon Vault Admin")</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B1326',
+                        'navy-deep': '#060E20',
+                        'navy-light': '#111D38',
+                        accent: '#DDB7FF',
+                        'accent-dark': '#b17be8',
+                        brand: '#CFC2D6',
+                        'neon-green': '#4ADE80',
+                        'neon-red': '#F87171',
+                        'neon-yellow': '#FBBF24',
+                        'neon-blue': '#60A5FA',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                        sora: ['Sora', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #060E20; }
+        ::-webkit-scrollbar-thumb { background: rgba(30, 41, 59, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(207, 194, 214, 0.5); }
+    </style>
+
+    @RenderSection("Styles", required: false)
+</head>
+<body class="bg-navy-deep text-white font-sans overflow-x-hidden min-h-screen">
+    @RenderBody()
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

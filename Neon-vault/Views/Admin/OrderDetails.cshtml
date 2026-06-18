@@ -1,0 +1,44 @@
+@model Neon_vault.Models.Order
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Order Details"; }
+
+<div class="flex min-h-screen">
+    @await Html.PartialAsync("_AdminSidebar", "Orders")
+    <div class="flex-1 overflow-y-auto">
+        <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-navy/50 sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <a href="/Admin/Orders" class="text-brand/40 hover:text-accent transition">← Back</a>
+                <h1 class="font-outfit text-lg font-bold text-white">Order #@Model.Id.ToString().Substring(0, 8).ToUpper()</h1>
+            </div>
+        </header>
+        <div class="p-6 max-w-3xl">
+            <!-- Order Info -->
+            <div class="bg-navy border border-slate-800/50 rounded-xl p-6 mb-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div><span class="text-brand/40 text-xs uppercase tracking-wider">Customer</span><p class="text-white mt-0.5 font-semibold">@Model.CustomerName</p></div>
+                    <div><span class="text-brand/40 text-xs uppercase tracking-wider">Email</span><p class="text-white mt-0.5">@Model.CustomerEmail</p></div>
+                    <div><span class="text-brand/40 text-xs uppercase tracking-wider">Date</span><p class="text-white mt-0.5">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</p></div>
+                    <div><span class="text-brand/40 text-xs uppercase tracking-wider">Status</span><p class="text-green-400 mt-0.5 font-semibold">@Model.PaymentStatus</p></div>
+                </div>
+            </div>
+
+            <!-- Items -->
+            <div class="bg-navy border border-slate-800/50 rounded-xl p-6">
+                <h2 class="font-outfit text-base font-bold text-white mb-4">Order Items</h2>
+                <div class="space-y-3 mb-5">
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <div class="flex items-center gap-4 py-2 border-b border-slate-800/20 last:border-0">
+                            <img src="@item.Game?.CoverImageUrl" alt="@item.Game?.Title" class="w-14 h-10 rounded object-cover" />
+                            <div class="flex-1"><span class="text-sm text-white font-semibold">@item.Game?.Title</span><span class="text-xs text-brand/40 block">@item.Game?.Genre</span></div>
+                            <span class="text-sm font-bold text-accent">$@item.PriceAtPurchase.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+                <div class="border-t border-slate-800/50 pt-4 flex justify-between items-center">
+                    <span class="text-sm font-semibold text-white">Total</span>
+                    <span class="text-xl font-extrabold text-accent font-sora">$@Model.TotalAmount.ToString("F2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

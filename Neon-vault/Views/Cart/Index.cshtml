@@ -1,0 +1,60 @@
+@model List<Neon_vault.Models.CartItem>
+@{
+    ViewData["Title"] = "Shopping Cart";
+    decimal total = ViewBag.Total;
+}
+
+<div class="max-w-4xl mx-auto px-6 py-8">
+    <div class="flex items-center gap-3 mb-8">
+        <svg class="w-6 h-6 text-accent fill-current" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <h1 class="font-sora text-2xl font-extrabold text-white">Shopping Cart</h1>
+        <span class="text-sm text-brand/40">(@Model.Count item@(Model.Count != 1 ? "s" : ""))</span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-20 bg-navy-deep border border-slate-800/50 rounded-2xl">
+            <span class="text-5xl mb-4 block">🛒</span>
+            <h2 class="font-outfit text-xl font-bold text-white mb-2">Your cart is empty</h2>
+            <p class="text-sm text-brand/50 mb-6">Browse our store and add some games!</p>
+            <a href="/Store" class="bg-accent text-navy-deep font-bold text-sm px-8 py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all">Browse Store</a>
+        </div>
+    }
+    else
+    {
+        <div class="space-y-3 mb-6">
+            @foreach (var item in Model)
+            {
+                <div class="bg-navy-deep border border-slate-800/50 rounded-xl p-4 flex items-center gap-4">
+                    <a href="/Store/ProductDetails/@item.GameId">
+                        <img src="@item.Game?.CoverImageUrl" alt="@item.Game?.Title" class="w-20 h-14 rounded-lg object-cover" />
+                    </a>
+                    <div class="flex-1 min-w-0">
+                        <a href="/Store/ProductDetails/@item.GameId" class="text-sm font-semibold text-white hover:text-accent transition">@item.Game?.Title</a>
+                        <p class="text-xs text-brand/40 mt-0.5">@item.Game?.Developer • @item.Game?.Genre</p>
+                    </div>
+                    <span class="text-sm font-bold text-accent">$@item.Game?.Price.ToString("F2")</span>
+                    <form method="post" action="/Cart/RemoveFromCart">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="w-8 h-8 rounded-lg bg-white/5 border border-slate-800/50 flex items-center justify-center text-brand/40 hover:text-red-400 hover:border-red-400/50 transition" title="Remove">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="bg-navy-deep border border-slate-800/50 rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-sm font-semibold text-white">Total (@Model.Count items)</span>
+                <span class="text-2xl font-extrabold text-accent font-sora">$@total.ToString("F2")</span>
+            </div>
+            <a href="/Checkout" class="block w-full bg-accent text-navy-deep font-bold text-sm py-3.5 rounded-lg hover:bg-accent-dark hover:text-white transition-all hover:shadow-[0_0_20px_rgba(221,183,255,0.4)] text-center">
+                Proceed to Checkout
+            </a>
+            <a href="/Store" class="block text-center text-sm text-brand/50 hover:text-accent transition mt-3">← Continue Shopping</a>
+        </div>
+    }
+</div>

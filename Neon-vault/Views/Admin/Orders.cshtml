@@ -1,0 +1,52 @@
+@model List<Neon_vault.Models.Order>
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "All Orders"; }
+
+<div class="flex min-h-screen">
+    @await Html.PartialAsync("_AdminSidebar", "Orders")
+    <div class="flex-1 overflow-y-auto">
+        <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-navy/50 sticky top-0 z-50">
+            <h1 class="font-outfit text-lg font-bold text-white">All Orders (@Model.Count)</h1>
+            <a href="/Admin/Logout" class="text-xs text-brand/40 hover:text-red-400 transition">Logout →</a>
+        </header>
+        <div class="p-6">
+            @if (!Model.Any())
+            {
+                <p class="text-sm text-brand/40 text-center py-12">No orders have been placed yet.</p>
+            }
+            else
+            {
+                <div class="bg-navy border border-slate-800/50 rounded-xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800/50 bg-navy-deep">
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Order ID</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Customer</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Email</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Items</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Total</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Date</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Status</th>
+                                <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr class="border-b border-slate-800/20 hover:bg-white/[0.02] transition">
+                                    <td class="py-3 px-4 text-xs font-mono text-accent">#@order.Id.ToString().Substring(0, 8).ToUpper()</td>
+                                    <td class="py-3 px-4 text-xs text-white font-semibold">@order.CustomerName</td>
+                                    <td class="py-3 px-4 text-xs text-brand/60">@order.CustomerEmail</td>
+                                    <td class="py-3 px-4 text-xs text-brand/60">@order.OrderItems.Count</td>
+                                    <td class="py-3 px-4 text-xs text-white font-semibold">$@order.TotalAmount.ToString("F2")</td>
+                                    <td class="py-3 px-4 text-xs text-brand/60">@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td class="py-3 px-4"><span class="text-[10px] font-semibold px-2.5 py-1 rounded-full border bg-green-400/10 text-green-400 border-green-400/30">@order.PaymentStatus</span></td>
+                                    <td class="py-3 px-4"><a href="/Admin/OrderDetails/@order.Id" class="text-xs text-accent hover:underline">View Receipt</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

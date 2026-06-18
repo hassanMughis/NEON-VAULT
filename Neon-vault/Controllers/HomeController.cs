@@ -1,25 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using Neon_vault.Models;
-using System.Diagnostics;
 
 namespace Neon_vault.Controllers
 {
+    /// <summary>
+    /// Home controller redirects to the Store page.
+    /// </summary>
     public class HomeController : Controller
     {
         public IActionResult Index()
         {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return RedirectToAction("Index", "Store");
         }
     }
 }

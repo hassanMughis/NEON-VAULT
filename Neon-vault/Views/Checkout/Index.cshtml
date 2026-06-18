@@ -1,0 +1,75 @@
+@model List<Neon_vault.Models.CartItem>
+@{
+    ViewData["Title"] = "Secure Checkout";
+    decimal total = ViewBag.Total;
+}
+
+<div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="flex items-center gap-3 mb-8">
+        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <h1 class="font-sora text-2xl font-extrabold text-white">Secure Checkout</h1>
+        <span class="text-xs text-brand/40 ml-auto">🔒 SSL Encrypted</span>
+    </div>
+
+    <form method="post" action="/Checkout/Complete">
+        @Html.AntiForgeryToken()
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Items + Form -->
+            <div class="lg:col-span-2 space-y-4">
+                <!-- Cart Items -->
+                @foreach (var item in Model)
+                {
+                    <div class="bg-navy-deep border border-slate-800/50 rounded-xl p-4 flex items-center gap-4">
+                        <img src="@item.Game?.CoverImageUrl" alt="@item.Game?.Title" class="w-20 h-14 rounded-lg object-cover" />
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-semibold text-white">@item.Game?.Title</h3>
+                            <p class="text-xs text-brand/40 mt-0.5">@item.Game?.Developer • @item.Game?.Genre</p>
+                        </div>
+                        <span class="text-sm font-bold text-accent">$@item.Game?.Price.ToString("F2")</span>
+                    </div>
+                }
+
+                <!-- Customer Info -->
+                <div class="bg-navy-deep border border-slate-800/50 rounded-xl p-5 mt-4">
+                    <h2 class="font-outfit text-lg font-bold text-white mb-4">Your Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Full Name</label>
+                            <input type="text" name="customerName" required placeholder="John Doe" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition placeholder:text-brand/30" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Email Address</label>
+                            <input type="email" name="customerEmail" required placeholder="player@example.com" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition placeholder:text-brand/30" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-navy-deep border border-slate-800/50 rounded-2xl p-6 sticky top-20">
+                    <h2 class="font-outfit text-lg font-bold text-white mb-5">Order Summary</h2>
+                    <div class="space-y-3 text-sm border-b border-slate-800/50 pb-4 mb-4">
+                        <div class="flex justify-between"><span class="text-brand/50">Subtotal (@Model.Count items)</span><span class="text-white">$@total.ToString("F2")</span></div>
+                        <div class="flex justify-between"><span class="text-brand/50">Tax</span><span class="text-white">$0.00</span></div>
+                    </div>
+                    <div class="flex justify-between items-center mb-5">
+                        <span class="text-sm font-semibold text-white">Total</span>
+                        <span class="text-2xl font-extrabold text-accent font-sora">$@total.ToString("F2")</span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3.5 rounded-lg hover:bg-accent-dark hover:text-white transition-all hover:shadow-[0_0_20px_rgba(221,183,255,0.4)] mb-3">
+                        🔒 Complete Purchase
+                    </button>
+                    <p class="text-[11px] text-brand/40 text-center">This is a simulated payment for academic purposes.</p>
+
+                    <div class="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-slate-800/50">
+                        <span class="text-[10px] text-brand/40">🔒 SSL Secure</span>
+                        <span class="text-[10px] text-brand/40">✅ Verified</span>
+                        <span class="text-[10px] text-brand/40">🛡️ Protected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,40 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Login";
+}
+
+<div class="min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-sm">
+        <div class="bg-navy border border-slate-800/50 rounded-2xl p-8 shadow-2xl">
+            <div class="text-center mb-8">
+                <a href="/Store" class="inline-flex items-center gap-2 font-sora text-2xl font-extrabold text-accent uppercase tracking-[1.5px]">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.99L18.49 19H5.51L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/></svg>
+                    Admin
+                </a>
+                <p class="text-sm text-brand/50 mt-2">Sign in to access the admin panel.</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-2 rounded-lg mb-4">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <form method="post" action="/Admin/Login" class="space-y-4">
+                @Html.AntiForgeryToken()
+                <div>
+                    <label class="text-xs text-brand/50 uppercase tracking-wider block mb-1.5">Username</label>
+                    <input type="text" name="username" required placeholder="admin" class="w-full bg-white/5 border border-slate-800/50 rounded-xl py-3 px-4 text-white text-sm outline-none focus:border-accent transition placeholder:text-brand/30" />
+                </div>
+                <div>
+                    <label class="text-xs text-brand/50 uppercase tracking-wider block mb-1.5">Password</label>
+                    <input type="password" name="password" required placeholder="••••••••" class="w-full bg-white/5 border border-slate-800/50 rounded-xl py-3 px-4 text-white text-sm outline-none focus:border-accent transition placeholder:text-brand/30" />
+                </div>
+                <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3.5 rounded-xl hover:bg-accent-dark hover:text-white transition-all">Sign In</button>
+            </form>
+
+            <p class="text-center text-xs text-brand/30 mt-6">Default: admin / admin123</p>
+        </div>
+    </div>
+</div>

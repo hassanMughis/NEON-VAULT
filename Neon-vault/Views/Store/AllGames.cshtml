@@ -1,0 +1,82 @@
+@model List<Neon_vault.Models.Game>
+@{
+    ViewData["Title"] = "All Games";
+    var genres = ViewBag.Genres as List<string> ?? new List<string>();
+    var selectedGenre = ViewBag.SelectedGenre as string ?? "All";
+    var search = ViewBag.Search as string ?? "";
+}
+
+@section Styles {
+<style>
+    .game-card { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, border-color 0.3s; }
+    .game-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(221, 183, 255, 0.12); border-color: rgba(221, 183, 255, 0.25); }
+    .game-card:hover .card-overlay { opacity: 1; }
+    .filter-chip { transition: all 0.2s; }
+    .filter-chip:hover, .filter-chip.active { background: rgba(221, 183, 255, 0.15); border-color: rgba(221, 183, 255, 0.4); color: #DDB7FF; }
+</style>
+}
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Search Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="font-sora text-2xl font-extrabold text-white">All Games</h1>
+            <p class="text-sm text-brand/50 mt-1">Showing @Model.Count result@(Model.Count != 1 ? "s" : "")</p>
+        </div>
+        <form method="get" action="/Store/AllGames" class="flex items-center gap-3">
+            <input type="hidden" name="genre" value="@selectedGenre" />
+            <div class="relative w-72">
+                <input type="text" name="search" value="@search" placeholder="Search all games..." class="w-full bg-white/10 border border-slate-800/50 rounded-lg py-2.5 pl-10 pr-4 text-white text-sm outline-none transition focus:border-accent placeholder:text-brand/40" />
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 fill-brand/40" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </div>
+            <button type="submit" class="bg-accent/20 border border-accent/30 text-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-accent hover:text-navy-deep transition">Search</button>
+        </form>
+    </div>
+
+    <!-- Genre Filter Chips -->
+    <div class="flex flex-wrap gap-2 mb-6">
+        <a href="/Store/AllGames?search=@search" class="filter-chip @(selectedGenre == "All" ? "active bg-accent/15 border-accent/40 text-accent" : "bg-white/5 border-slate-800/50 text-brand/60") border text-xs font-semibold px-4 py-1.5 rounded-full">All</a>
+        @foreach (var genre in genres)
+        {
+            <a href="/Store/AllGames?genre=@genre&search=@search" class="filter-chip @(selectedGenre == genre ? "active bg-accent/15 border-accent/40 text-accent" : "bg-white/5 border-slate-800/50 text-brand/60") border text-xs font-semibold px-4 py-1.5 rounded-full">@genre</a>
+        }
+    </div>
+
+    <!-- Games Grid -->
+    @if (!Model.Any())
+    {
+        <div class="text-center py-20">
+            <span class="text-4xl mb-4 block">🎮</span>
+            <h2 class="font-outfit text-xl font-bold text-white mb-2">No games found</h2>
+            <p class="text-sm text-brand/50">Try adjusting your search or filters.</p>
+            <a href="/Store/AllGames" class="inline-block mt-4 bg-accent/20 border border-accent/30 text-accent text-sm font-semibold px-6 py-2 rounded-lg hover:bg-accent hover:text-navy-deep transition">Clear Filters</a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+            @foreach (var game in Model)
+            {
+                <div class="game-card bg-navy-deep border border-slate-800/50 rounded-xl overflow-hidden flex flex-col group">
+                    <a href="/Store/ProductDetails/@game.Id" class="relative h-[220px] overflow-hidden block">
+                        <img src="@game.CoverImageUrl" alt="@game.Title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <div class="card-overlay absolute inset-0 bg-gradient-to-t from-navy/90 to-transparent opacity-0 transition-opacity duration-300 flex items-end p-3">
+                            <span class="text-xs text-accent font-semibold">View Details →</span>
+                        </div>
+                    </a>
+                    <div class="p-3 flex flex-col gap-1.5 flex-1">
+                        <span class="text-[10px] text-accent/80 font-semibold uppercase tracking-wider">@game.Genre</span>
+                        <h3 class="text-sm font-semibold text-white truncate">@game.Title</h3>
+                        <span class="text-sm font-bold text-white mt-auto">$@game.Price.ToString("F2")</span>
+                        <form method="post" action="/Cart/AddToCart">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="gameId" value="@game.Id" />
+                            <input type="hidden" name="returnUrl" value="/Store/AllGames?genre=@selectedGenre&search=@search" />
+                            <button type="submit" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-1.5 rounded-lg hover:bg-accent hover:text-navy-deep transition mt-1">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

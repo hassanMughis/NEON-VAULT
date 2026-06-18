@@ -1,0 +1,36 @@
+@model string
+@{
+    var activePage = Model ?? "";
+}
+
+<aside class="w-60 bg-navy border-r border-slate-800/50 flex flex-col shrink-0">
+    <div class="h-16 flex items-center px-5 border-b border-slate-800/50">
+        <a href="/Store" class="font-sora text-lg font-extrabold text-accent uppercase tracking-[1.5px] flex items-center gap-2">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.99L18.49 19H5.51L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/></svg>
+            Neon Vault
+        </a>
+        <span class="ml-auto text-[9px] text-navy-deep bg-accent font-bold px-1.5 py-0.5 rounded">ADMIN</span>
+    </div>
+
+    <nav class="flex-1 py-4 px-3 space-y-1">
+        <a href="/Admin/Dashboard" class="flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg transition @(activePage == "Dashboard" ? "bg-accent/10 text-accent" : "text-brand/50 hover:bg-white/5 hover:text-accent")">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Dashboard
+        </a>
+        <a href="/Admin/Orders" class="flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg transition @(activePage == "Orders" ? "bg-accent/10 text-accent" : "text-brand/50 hover:bg-white/5 hover:text-accent")">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            Orders
+        </a>
+        <a href="/Admin/Games" class="flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg transition @(activePage == "Games" ? "bg-accent/10 text-accent" : "text-brand/50 hover:bg-white/5 hover:text-accent")">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+            Games
+        </a>
+    </nav>
+
+    <div class="border-t border-slate-800/50 p-4">
+        <a href="/Admin/Logout" class="flex items-center gap-2 text-xs text-brand/40 hover:text-red-400 transition">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Logout
+        </a>
+    </div>
+</aside>

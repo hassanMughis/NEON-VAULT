@@ -1,0 +1,98 @@
+@model Neon_vault.Models.Game
+@{
+    ViewData["Title"] = Model.Title;
+    bool inCart = ViewBag.InCart ?? false;
+    bool inLibrary = ViewBag.InLibrary ?? false;
+}
+
+@section Styles {
+<style>
+    .tag-chip { transition: all 0.2s; }
+    .tag-chip:hover { background: rgba(221, 183, 255, 0.12); border-color: rgba(221, 183, 255, 0.3); color: #DDB7FF; }
+</style>
+}
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs text-brand/40 mb-6">
+        <a href="/Store" class="hover:text-accent transition">Store</a>
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        <a href="/Store/AllGames" class="hover:text-accent transition">All Games</a>
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        <span class="text-accent">@Model.Title</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Media & Description -->
+        <div class="lg:col-span-2">
+            <div class="rounded-2xl overflow-hidden h-[400px] bg-navy-deep border border-slate-800/50">
+                <img src="@Model.CoverImageUrl" alt="@Model.Title" class="w-full h-full object-cover" />
+            </div>
+
+            <div class="mt-8">
+                <h2 class="font-outfit text-lg font-bold text-white mb-4">About This Game</h2>
+                <p class="text-sm text-brand/60 leading-relaxed">@Model.Description</p>
+
+                <div class="flex flex-wrap gap-2 mt-5">
+                    <span class="tag-chip bg-white/5 border border-slate-800/50 text-brand/60 text-[11px] font-semibold px-3 py-1 rounded-full">@Model.Genre</span>
+                    <span class="tag-chip bg-white/5 border border-slate-800/50 text-brand/60 text-[11px] font-semibold px-3 py-1 rounded-full">Singleplayer</span>
+                    <span class="tag-chip bg-white/5 border border-slate-800/50 text-brand/60 text-[11px] font-semibold px-3 py-1 rounded-full">PC</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Purchase Panel -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-20">
+                <div class="bg-navy-deep border border-slate-800/50 rounded-2xl p-6">
+                    <div class="rounded-xl overflow-hidden h-32 mb-4">
+                        <img src="@Model.CoverImageUrl" alt="@Model.Title" class="w-full h-full object-cover" />
+                    </div>
+                    <h1 class="font-sora text-xl font-extrabold text-white mb-1">@Model.Title</h1>
+                    <p class="text-xs text-brand/50 mb-4">by @Model.Developer</p>
+
+                    <div class="bg-white/5 border border-slate-800/50 rounded-xl p-4 mb-4">
+                        <span class="text-2xl font-extrabold text-accent font-sora">$@Model.Price.ToString("F2")</span>
+                    </div>
+
+                    @if (inLibrary)
+                    {
+                        <div class="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold text-sm py-3 rounded-lg text-center mb-2">
+                            ✅ You Own This Game
+                        </div>
+                        <a href="/Library" class="block w-full bg-white/10 border border-white/20 text-white font-semibold text-sm py-3 rounded-lg hover:bg-white/20 transition text-center">
+                            Go to Library
+                        </a>
+                    }
+                    else if (inCart)
+                    {
+                        <div class="w-full bg-accent/20 border border-accent/40 text-accent font-bold text-sm py-3 rounded-lg text-center mb-2">
+                            🛒 Already in Cart
+                        </div>
+                        <a href="/Cart" class="block w-full bg-accent text-navy-deep font-bold text-sm py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all text-center">
+                            View Cart
+                        </a>
+                    }
+                    else
+                    {
+                        <form method="post" action="/Cart/AddToCart">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="gameId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="/Store/ProductDetails/@Model.Id" />
+                            <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all hover:shadow-[0_0_20px_rgba(221,183,255,0.4)] mb-2">
+                                Add to Cart — $@Model.Price.ToString("F2")
+                            </button>
+                        </form>
+                    }
+
+                    <div class="space-y-3 text-sm border-t border-slate-800/50 pt-4 mt-4">
+                        <div class="flex justify-between"><span class="text-brand/40">Developer</span><span class="text-white">@Model.Developer</span></div>
+                        <div class="flex justify-between"><span class="text-brand/40">Genre</span><span class="text-white">@Model.Genre</span></div>
+                        <div class="flex justify-between"><span class="text-brand/40">Release Date</span><span class="text-white">@Model.ReleaseDate.ToString("MMM dd, yyyy")</span></div>
+                        <div class="flex justify-between"><span class="text-brand/40">Platform</span><span class="text-white">PC</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
