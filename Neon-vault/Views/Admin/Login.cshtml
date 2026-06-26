@@ -1,6 +1,6 @@
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Admin Login";
+    ViewData["Title"] = "Sign In";
 }
 
 <div class="min-h-screen flex items-center justify-center p-6">
@@ -9,9 +9,9 @@
             <div class="text-center mb-8">
                 <a href="/Store" class="inline-flex items-center gap-2 font-sora text-2xl font-extrabold text-accent uppercase tracking-[1.5px]">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.99L18.49 19H5.51L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/></svg>
-                    Admin
+                    Neon Vault
                 </a>
-                <p class="text-sm text-brand/50 mt-2">Sign in to access the admin panel.</p>
+                <p class="text-sm text-brand/50 mt-2">Sign in to continue to your account.</p>
             </div>
 
             @if (ViewBag.Error != null)
@@ -34,7 +34,12 @@
                 <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3.5 rounded-xl hover:bg-accent-dark hover:text-white transition-all">Sign In</button>
             </form>
 
-            <p class="text-center text-xs text-brand/30 mt-6">Default: admin / admin123</p>
+            <div class="mt-4 flex flex-col gap-2 text-center">
+                <a href="/Account/Register" class="text-sm text-accent hover:underline">Create account</a>
+                <a href="/Community" class="text-sm text-brand/50 hover:text-accent">Continue as guest</a>
+            </div>
+
+            <p class="text-center text-xs text-brand/30 mt-6">Use your account credentials or create a new one.</p>
         </div>
     </div>
 </div>

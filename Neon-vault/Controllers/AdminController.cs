@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neon_vault.Data;
+using Neon_vault.Helpers;
 using Neon_vault.Models;
 
 namespace Neon_vault.Controllers
@@ -32,22 +33,66 @@ namespace Neon_vault.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(string username, string password)
+        public async Task<IActionResult> Login(string username, string password)
         {
-            // Hardcoded admin credentials
-            if (username == "admin" && password == "admin123")
+            var normalizedUsername = (username ?? string.Empty).Trim();
+            var user = await _db.ChatUsers.FirstOrDefaultAsync(u => u.Username.ToLower() == normalizedUsername.ToLower() && u.IsActive);
+
+            if (user != null && SecurityHelper.VerifyPassword(password, user.PasswordHash))
             {
-                HttpContext.Session.SetString("IsAdmin", "true");
-                return RedirectToAction("Dashboard");
+                var sessionId = GetSessionId();
+                var guestUser = await _db.ChatUsers.FirstOrDefaultAsync(u => u.SessionId == sessionId && u.IsTemporaryGuest && u.Id != user.Id);
+                if (guestUser != null)
+                {
+                    var guestMessages = await _db.Messages.Where(m => m.UserId == guestUser.Id).ToListAsync();
+                    foreach (var message in guestMessages)
+                    {
+                        message.UserId = user.Id;
+                    }
+                    _db.ChatUsers.Remove(guestUser);
+                    await _db.SaveChangesAsync();
+                }
+
+                user.SessionId = sessionId;
+                await _db.SaveChangesAsync();
+
+                HttpContext.Session.SetString("IsAdmin", user.IsAdmin ? "true" : "false");
+                HttpContext.Session.SetString("CurrentUserId", user.Id.ToString());
+                HttpContext.Session.SetString("CurrentUserName", string.IsNullOrWhiteSpace(user.DisplayName) ? user.Username : user.DisplayName);
+                HttpContext.Session.SetString("CurrentUserUsername", user.Username);
+                HttpContext.Session.SetString("CurrentUserProfileImageUrl", user.ProfileImageUrl ?? string.Empty);
+
+                if (user.IsAdmin)
+                {
+                    return RedirectToAction("Dashboard");
+                }
+
+                TempData["Message"] = "Signed in successfully.";
+                return RedirectToAction("Index", "Community");
             }
 
             ViewBag.Error = "Invalid username or password.";
             return View();
         }
 
+        private string GetSessionId()
+        {
+            var sessionId = Request.Cookies["CartSessionId"];
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                sessionId = Guid.NewGuid().ToString();
+                Response.Cookies.Append("CartSessionId", sessionId, new CookieOptions { Expires = DateTime.Now.AddDays(30) });
+            }
+            return sessionId;
+        }
+
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("IsAdmin");
+            HttpContext.Session.Remove("CurrentUserId");
+            HttpContext.Session.Remove("CurrentUserName");
+            HttpContext.Session.Remove("CurrentUserUsername");
+            HttpContext.Session.Remove("CurrentUserProfileImageUrl");
             return RedirectToAction("Login");
         }
 
@@ -105,6 +150,14 @@ namespace Neon_vault.Controllers
 
             var games = await _db.Games.OrderBy(g => g.Title).ToListAsync();
             return View(games);
+        }
+
+        public async Task<IActionResult> Users()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login");
+
+            var users = await _db.ChatUsers.OrderBy(u => u.Username).ToListAsync();
+            return View(users);
         }
 
         [HttpGet]

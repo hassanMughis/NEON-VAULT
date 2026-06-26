@@ -1,0 +1,68 @@
+@model Neon_vault.Models.ChatUser
+@{
+    ViewData["Title"] = "Account Settings";
+}
+
+<div class="min-h-screen bg-navy px-6 py-10 text-white">
+    <div class="mx-auto max-w-4xl rounded-3xl border border-slate-800/50 bg-navy-deep p-8 shadow-2xl">
+        <div class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+                <p class="text-sm uppercase tracking-[2px] text-accent">Profile</p>
+                <h1 class="font-sora text-3xl font-bold">Account Settings</h1>
+                <p class="mt-2 text-sm text-brand/60">Manage your community identity and keep your profile up to date.</p>
+            </div>
+            <a href="/Community" class="text-sm text-accent hover:underline">Back to Community →</a>
+        </div>
+
+        @if (TempData["Message"] != null)
+        {
+            <div class="mb-6 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">@TempData["Message"]</div>
+        }
+
+        <form method="post" asp-action="UpdateProfile" enctype="multipart/form-data" class="grid gap-6 md:grid-cols-2">
+            @Html.AntiForgeryToken()
+            <div class="md:col-span-2 rounded-2xl border border-slate-800/60 bg-white/5 p-5">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-[2px] text-brand/50">Profile Picture</h2>
+                <div class="flex flex-col gap-4 md:flex-row md:items-center">
+                    <img src="@(string.IsNullOrWhiteSpace(Model.ProfileImageUrl) ? "/images/neon_avatar.png" : Model.ProfileImageUrl)" alt="Current profile" class="h-24 w-24 rounded-full border border-slate-700 object-cover" />
+                    <div class="flex-1">
+                        <label class="mb-2 block text-sm text-brand/60">Upload a new image</label>
+                        <input type="file" name="profileImage" accept="image/*" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                        <p class="mt-2 text-xs text-brand/40">PNG, JPG, WEBP, or GIF up to your browser limits.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 rounded-2xl border border-slate-800/60 bg-white/5 p-5">
+                <h2 class="mb-3 text-sm font-semibold uppercase tracking-[2px] text-brand/50">Basic Info</h2>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label class="mb-2 block text-sm text-brand/60">Username</label>
+                        <input asp-for="Username" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-sm text-brand/60">Display Name</label>
+                        <input asp-for="DisplayName" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-sm text-brand/60">Email</label>
+                        <input asp-for="Email" type="email" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-sm text-brand/60">New Password</label>
+                        <input name="PasswordHash" type="password" placeholder="Leave blank to keep current password" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 rounded-2xl border border-slate-800/60 bg-white/5 p-5">
+                <h2 class="mb-3 text-sm font-semibold uppercase tracking-[2px] text-brand/50">About You</h2>
+                <textarea asp-for="Bio" rows="4" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" placeholder="Tell players a little about yourself..."></textarea>
+            </div>
+
+            <div class="md:col-span-2 flex justify-end">
+                <button type="submit" class="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-navy-deep transition hover:bg-accent-dark">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+@model List<Neon_vault.Models.ChatUser>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="flex min-h-screen">
+    @await Html.PartialAsync("_AdminSidebar", "Users")
+
+    <div class="flex-1 overflow-y-auto">
+        <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-navy/50 sticky top-0 z-50">
+            <h1 class="font-outfit text-lg font-bold text-white">Users</h1>
+            <a href="/Account/Register" class="text-xs text-accent hover:underline">Create New User →</a>
+        </header>
+
+        <div class="p-6">
+            @if (TempData["Message"] != null)
+            {
+                <div class="mb-4 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">@TempData["Message"]</div>
+            }
+
+            <div class="overflow-x-auto rounded-xl border border-slate-800/50 bg-navy">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-800/50 bg-white/[0.02]">
+                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">User</th>
+                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">Email</th>
+                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">Role</th>
+                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr class="border-b border-slate-800/20 hover:bg-white/[0.02]">
+                                <td class="px-4 py-3 text-white">
+                                    <div class="font-semibold">@user.Username</div>
+                                    <div class="text-xs text-brand/40">@user.DisplayName</div>
+                                </td>
+                                <td class="px-4 py-3 text-brand/60">@user.Email</td>
+                                <td class="px-4 py-3 text-brand/60">@(user.IsAdmin ? "Admin" : "Member")</td>
+                                <td class="px-4 py-3 text-brand/60">@(user.IsActive ? "Active" : "Disabled")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+@model Neon_vault.Models.ChatUser
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="min-h-screen bg-navy px-6 py-10 text-white">
+    <div class="mx-auto max-w-2xl rounded-3xl border border-slate-800/50 bg-navy-deep p-8 shadow-2xl">
+        <div class="mb-8">
+            <p class="text-sm uppercase tracking-[2px] text-accent">Join Neon Vault</p>
+            <h1 class="font-sora text-3xl font-bold">Create your account</h1>
+            <p class="mt-2 text-sm text-brand/60">Register once and your profile will stay with you in the community.</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                @Html.ValidationSummary(false, "", new { @class = "text-sm" })
+            </div>
+        }
+
+        <form method="post" asp-action="Register" class="space-y-5">
+            @Html.AntiForgeryToken()
+            <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                    <label class="mb-2 block text-sm text-brand/60">Username</label>
+                    <input asp-for="Username" required class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                </div>
+                <div>
+                    <label class="mb-2 block text-sm text-brand/60">Display Name</label>
+                    <input asp-for="DisplayName" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                </div>
+                <div>
+                    <label class="mb-2 block text-sm text-brand/60">Email</label>
+                    <input asp-for="Email" type="email" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                </div>
+                <div>
+                    <label class="mb-2 block text-sm text-brand/60">Password</label>
+                    <input name="password" type="password" required class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" />
+                </div>
+            </div>
+            <div>
+                <label class="mb-2 block text-sm text-brand/60">Bio</label>
+                <textarea asp-for="Bio" rows="4" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" placeholder="Tell people what you play..."></textarea>
+            </div>
+            <div class="flex items-center justify-between">
+                <a href="/Community" class="text-sm text-brand/50 hover:text-accent">Skip for now</a>
+                <button type="submit" class="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-navy-deep transition hover:bg-accent-dark">Create Account</button>
+            </div>
+        </form>
+    </div>
+</div>

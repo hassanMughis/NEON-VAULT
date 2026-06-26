@@ -2,6 +2,9 @@
 @{
     var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").ToLowerInvariant();
     var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
+    var currentUserName = Context.Session.GetString("CurrentUserName");
+    var currentUserProfileImageUrl = Context.Session.GetString("CurrentUserProfileImageUrl");
+    var isAdmin = Context.Session.GetString("IsAdmin") == "true";
 
     string NavLinkClasses(string controllerName, string actionName = "index") =>
         (currentController == controllerName.ToLowerInvariant() && currentAction == actionName.ToLowerInvariant())
@@ -74,6 +77,7 @@
                     <a href="/Store" class="@NavLinkClasses("Store", "index")">Store</a>
                     <a href="/Library" class="@NavLinkClasses("Library", "index")">Library</a>
                     <a href="/Community" class="@NavLinkClasses("Community", "index")">Community</a>
+                    <a href="/Account/Settings" class="@NavLinkClasses("Account", "settings")">Settings</a>
                     <a href="/Home/Contact" class="@NavLinkClasses("Home", "contact")">Support</a>
                 </nav>
             </div>
@@ -95,12 +99,33 @@
                     <span id="cart-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center hidden">0</span>
                 </a>
 
-                <!-- Admin Link -->
-                <a href="/Admin/Dashboard" class="bg-transparent border-none cursor-pointer w-[38px] h-[38px] rounded-full flex items-center justify-center text-brand transition hover:bg-white/10 hover:text-accent" title="Admin Panel">
-                    <svg class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-                    </svg>
-                </a>
+                @if (isAdmin)
+                {
+                    <a href="/Admin/Dashboard" class="bg-transparent border-none cursor-pointer w-[38px] h-[38px] rounded-full flex items-center justify-center text-brand transition hover:bg-white/10 hover:text-accent" title="Admin Panel">
+                        <svg class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                        </svg>
+                    </a>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(currentUserName))
+                {
+                    <a href="/Account/Settings" class="flex items-center gap-2 rounded-full border border-slate-800/50 bg-white/5 px-3 py-2 text-sm text-white transition hover:bg-white/10">
+                        @if (!string.IsNullOrWhiteSpace(currentUserProfileImageUrl))
+                        {
+                            <img src="@currentUserProfileImageUrl" alt="Profile" class="h-7 w-7 rounded-full object-cover" />
+                        }
+                        else
+                        {
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">@currentUserName.Substring(0, 1).ToUpperInvariant()</span>
+                        }
+                        <span class="max-w-[100px] truncate">@currentUserName</span>
+                    </a>
+                }
+                else
+                {
+                    <a href="/Admin/Login" class="rounded-full border border-slate-800/50 bg-white/5 px-3 py-2 text-sm text-brand/70 transition hover:bg-white/10 hover:text-accent">Login</a>
+                }
             </div>
         </header>
 
@@ -141,10 +166,13 @@
                         <a href="/Cart" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">Shopping Cart</a>
                         <a href="/Library" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">My Library</a>
                     </div>
-                    <div class="flex flex-col gap-3 min-w-[120px]">
-                        <div class="font-outfit text-xs font-bold text-white tracking-[1.5px] uppercase mb-1">Admin</div>
-                        <a href="/Admin/Login" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">Admin Panel</a>
-                    </div>
+                    @if (isAdmin)
+                    {
+                        <div class="flex flex-col gap-3 min-w-[120px]">
+                            <div class="font-outfit text-xs font-bold text-white tracking-[1.5px] uppercase mb-1">Admin</div>
+                            <a href="/Admin/Dashboard" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">Admin Panel</a>
+                        </div>
+                    }
                 </div>
             </div>
 

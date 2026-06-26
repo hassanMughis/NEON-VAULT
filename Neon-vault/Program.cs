@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Neon_vault.Data;
+using Neon_vault.Helpers;
+using Neon_vault.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,24 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    await db.Database.MigrateAsync();
+    await db.Database.ExecuteSqlRawAsync(@"IF COL_LENGTH('ChatUsers', 'ProfileImageUrl') IS NULL ALTER TABLE ChatUsers ADD ProfileImageUrl nvarchar(500) NULL;");
+
+    if (!await db.ChatUsers.AnyAsync(u => u.IsAdmin))
+    {
+        db.ChatUsers.Add(new ChatUser
+        {
+            Username = "admin",
+            DisplayName = "Administrator",
+            Email = "admin@neonvault.com",
+            PasswordHash = SecurityHelper.HashPassword("admin123"),
+            IsAdmin = true,
+            IsTemporaryGuest = false,
+            SessionId = "seed-admin",
+            AvatarColorHex = "#DDB7FF"
+        });
+        await db.SaveChangesAsync();
+    }
 }
 
 // Configure the HTTP request pipeline.

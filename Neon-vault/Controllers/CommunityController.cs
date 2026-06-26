@@ -17,23 +17,8 @@ namespace Neon_vault.Controllers
         public async Task<IActionResult> Index()
         {
             var sessionId = GetSessionId();
-            var user = await _db.ChatUsers.FirstOrDefaultAsync(u => u.SessionId == sessionId);
+            var user = await GetOrCreateCurrentUserAsync(sessionId);
 
-            if (user == null)
-            {
-                // Guest Mode logic
-                user = new ChatUser
-                {
-                    SessionId = sessionId,
-                    Username = "Guest_" + Guid.NewGuid().ToString().Substring(0, 5),
-                    IsTemporaryGuest = true,
-                    AvatarColorHex = GetRandomHexColor()
-                };
-                _db.ChatUsers.Add(user);
-                await _db.SaveChangesAsync();
-            }
-
-            // Ensure we have default channels
             if (!await _db.Channels.AnyAsync())
             {
                 _db.Channels.Add(new Channel { Name = "General", Category = "Main" });
@@ -42,7 +27,6 @@ namespace Neon_vault.Controllers
                 await _db.SaveChangesAsync();
             }
 
-            // Seed dummy community users and messages if none exist
             if (!await _db.Messages.AnyAsync())
             {
                 await SeedDummyMessages();
@@ -70,7 +54,7 @@ namespace Neon_vault.Controllers
                 .Select(m => new
                 {
                     id = m.Id,
-                    userId = m.UserId.ToString(),
+                    userId = m.UserId.ToString().ToLowerInvariant(),
                     username = m.User.Username,
                     avatarColor = m.User.AvatarColorHex,
                     body = m.Body,
@@ -105,9 +89,40 @@ namespace Neon_vault.Controllers
             return Json(new { url = "/uploads/" + fileName });
         }
 
+        private async Task<ChatUser> GetOrCreateCurrentUserAsync(string sessionId)
+        {
+            var currentUserId = HttpContext.Session.GetString("CurrentUserId");
+            if (Guid.TryParse(currentUserId, out var parsedUserId))
+            {
+                var sessionUser = await _db.ChatUsers.FirstOrDefaultAsync(u => u.Id == parsedUserId);
+                if (sessionUser != null)
+                {
+                    sessionUser.SessionId = sessionId;
+                    await _db.SaveChangesAsync();
+                    return sessionUser;
+                }
+            }
+
+            var user = await _db.ChatUsers.FirstOrDefaultAsync(u => u.SessionId == sessionId);
+            if (user == null)
+            {
+                user = new ChatUser
+                {
+                    SessionId = sessionId,
+                    Username = "Guest_" + Guid.NewGuid().ToString().Substring(0, 5),
+                    IsTemporaryGuest = true,
+                    AvatarColorHex = GetRandomHexColor()
+                };
+                _db.ChatUsers.Add(user);
+                await _db.SaveChangesAsync();
+            }
+
+            HttpContext.Session.SetString("CurrentUserId", user.Id.ToString());
+            return user;
+        }
+
         private async Task SeedDummyMessages()
         {
-            // Create dummy community users
             var user1 = new ChatUser
             {
                 Username = "NeonGamer42",
@@ -150,7 +165,6 @@ namespace Neon_vault.Controllers
 
             var messages = new List<Message>
             {
-                // General channel conversation
                 new Message { ChannelId = generalChannel.Id, UserId = user1.Id, Body = "Hey everyone! Just picked up Neon Phantom, the cyberpunk RPG vibes are insane 🔥", Timestamp = baseTime },
                 new Message { ChannelId = generalChannel.Id, UserId = user2.Id, Body = "Dude same! The neural implant upgrade system is so deep. I'm already 20 hours in", Timestamp = baseTime.AddMinutes(2) },
                 new Message { ChannelId = generalChannel.Id, UserId = user3.Id, Body = "Wait is that the open-world one? I've been eyeing Arcane Rift instead", Timestamp = baseTime.AddMinutes(5) },
@@ -159,15 +173,11 @@ namespace Neon_vault.Controllers
                 new Message { ChannelId = generalChannel.Id, UserId = user2.Id, Body = "Welcome! Check the LFG channel, there's usually people looking for groups there 👊", Timestamp = baseTime.AddMinutes(17) },
                 new Message { ChannelId = generalChannel.Id, UserId = user3.Id, Body = "Has anyone seen the new hardware drops? That RTX 6090 is absolutely wild", Timestamp = baseTime.AddMinutes(30) },
                 new Message { ChannelId = generalChannel.Id, UserId = user1.Id, Body = "Yeah the price tag is wild too lol. But for true path tracing it's worth it", Timestamp = baseTime.AddMinutes(32) },
-
-                // Hardware Setup channel conversation
                 new Message { ChannelId = hardwareChannel.Id, UserId = user3.Id, Body = "Anyone running the Nexus Pro Core Console? How's the 4K 120fps performance?", Timestamp = baseTime.AddMinutes(10) },
                 new Message { ChannelId = hardwareChannel.Id, UserId = user4.Id, Body = "Got mine last week. Absolutely silent and the SSD load times are insane. Games load in under 2 seconds", Timestamp = baseTime.AddMinutes(12) },
                 new Message { ChannelId = hardwareChannel.Id, UserId = user1.Id, Body = "I paired it with the Tactical Comm Pack headset. The 7.1 surround is chef's kiss 🎧", Timestamp = baseTime.AddMinutes(20) },
                 new Message { ChannelId = hardwareChannel.Id, UserId = user2.Id, Body = "Is the Elite Controller worth the upgrade from the standard one?", Timestamp = baseTime.AddMinutes(25) },
                 new Message { ChannelId = hardwareChannel.Id, UserId = user4.Id, Body = "100%. The trigger stops and customizable paddles completely changed my FPS gameplay", Timestamp = baseTime.AddMinutes(27) },
-
-                // LFG channel conversation
                 new Message { ChannelId = lfgChannel.Id, UserId = user4.Id, Body = "LFG Void Runners ranked! Need 2 more for a 4-stack. Gold rank+", Timestamp = baseTime.AddMinutes(40) },
                 new Message { ChannelId = lfgChannel.Id, UserId = user2.Id, Body = "I'm Platinum 2, main support class. Down to run some games!", Timestamp = baseTime.AddMinutes(42) },
                 new Message { ChannelId = lfgChannel.Id, UserId = user1.Id, Body = "Count me in. Diamond 1 assault main. Let's go 🚀", Timestamp = baseTime.AddMinutes(45) },

@@ -43,7 +43,6 @@ namespace Neon_vault.Hubs
             _db.Messages.Add(chatMessage);
             await _db.SaveChangesAsync();
 
-            // Fetch product info if exists
             var productInfo = "";
             if (prodId != null)
             {
@@ -57,7 +56,7 @@ namespace Neon_vault.Hubs
             await Clients.Group(channelId).SendAsync("ReceiveMessage", new
             {
                 id = chatMessage.Id,
-                userId = user.Id,
+                userId = user.Id.ToString().ToLowerInvariant(),
                 username = user.Username,
                 avatarColor = user.AvatarColorHex,
                 body = message,
