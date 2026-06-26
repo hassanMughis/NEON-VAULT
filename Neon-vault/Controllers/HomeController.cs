@@ -1,15 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Neon_vault.Data;
 
 namespace Neon_vault.Controllers
 {
-    /// <summary>
-    /// Home controller redirects to the Store page.
-    /// </summary>
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly AppDbContext _db;
+
+        public HomeController(AppDbContext db)
         {
-            return RedirectToAction("Index", "Store");
+            _db = db;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var games = await _db.Games.OrderBy(g => g.Title).ToListAsync();
+            return View(games);
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
         }
     }
 }

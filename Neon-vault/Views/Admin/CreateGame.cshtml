@@ -1,15 +1,15 @@
 @model Neon_vault.Models.Game
-@{ Layout = "_AdminLayout"; ViewData["Title"] = "Add New Game"; }
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Add New Product"; }
 
 <div class="flex min-h-screen">
     @await Html.PartialAsync("_AdminSidebar", "Games")
     <div class="flex-1 overflow-y-auto">
         <header class="h-16 border-b border-slate-800/50 flex items-center px-6 bg-navy/50 sticky top-0 z-50">
             <a href="/Admin/Games" class="text-brand/40 hover:text-accent transition mr-3">← Back</a>
-            <h1 class="font-outfit text-lg font-bold text-white">Add New Game</h1>
+            <h1 class="font-outfit text-lg font-bold text-white">Add New Product</h1>
         </header>
         <div class="p-6 max-w-2xl">
-            <form method="post" action="/Admin/CreateGame" class="bg-navy border border-slate-800/50 rounded-xl p-6 space-y-4">
+            <form method="post" action="/Admin/CreateGame" enctype="multipart/form-data" class="bg-navy border border-slate-800/50 rounded-xl p-6 space-y-4">
                 @Html.AntiForgeryToken()
                 <div>
                     <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Title</label>
@@ -40,11 +40,37 @@
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Cover Image URL</label>
-                    <input type="text" name="CoverImageUrl" value="@Model.CoverImageUrl" placeholder="/images/game_card_1.png" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition" />
+                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Category</label>
+                    <select name="Category" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition">
+                        <option value="Game" selected>Game</option>
+                        <option value="Hardware">Hardware</option>
+                    </select>
                 </div>
-                <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all">Create Game</button>
+                <div>
+                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Cover Image</label>
+                    <div class="relative">
+                        <input type="file" name="CoverImage" accept="image/*" id="cover-image-input" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-accent/20 file:text-accent hover:file:bg-accent hover:file:text-navy-deep" />
+                    </div>
+                    <div id="image-preview" class="mt-3 hidden">
+                        <img id="preview-img" src="" alt="Preview" class="h-40 w-auto object-cover rounded-lg border border-slate-800/50" />
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all">Create Product</button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('cover-image-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('preview-img').src = ev.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>

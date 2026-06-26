@@ -116,16 +116,39 @@ namespace Neon_vault.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateGame(Game game)
+        public async Task<IActionResult> CreateGame(Game game, IFormFile? CoverImage)
         {
             if (!IsAdmin()) return RedirectToAction("Login");
+
+            // Remove CoverImageUrl from validation since we handle it via file upload
+            ModelState.Remove("CoverImageUrl");
 
             if (ModelState.IsValid)
             {
                 game.Id = Guid.NewGuid();
+
+                if (CoverImage != null && CoverImage.Length > 0)
+                {
+                    var fileName = Guid.NewGuid() + Path.GetExtension(CoverImage.FileName);
+                    var imagesDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                    Directory.CreateDirectory(imagesDir);
+                    var filePath = Path.Combine(imagesDir, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await CoverImage.CopyToAsync(stream);
+                    }
+
+                    game.CoverImageUrl = "/images/" + fileName;
+                }
+                else
+                {
+                    game.CoverImageUrl = "/images/game_card_1.png"; // fallback
+                }
+
                 _db.Games.Add(game);
                 await _db.SaveChangesAsync();
-                TempData["Message"] = $"Game '{game.Title}' created!";
+                TempData["Message"] = $"Product '{game.Title}' created!";
                 return RedirectToAction("Games");
             }
 
@@ -144,15 +167,32 @@ namespace Neon_vault.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditGame(Game game)
+        public async Task<IActionResult> EditGame(Game game, IFormFile? CoverImage)
         {
             if (!IsAdmin()) return RedirectToAction("Login");
 
+            ModelState.Remove("CoverImageUrl");
+
             if (ModelState.IsValid)
             {
+                if (CoverImage != null && CoverImage.Length > 0)
+                {
+                    var fileName = Guid.NewGuid() + Path.GetExtension(CoverImage.FileName);
+                    var imagesDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                    Directory.CreateDirectory(imagesDir);
+                    var filePath = Path.Combine(imagesDir, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await CoverImage.CopyToAsync(stream);
+                    }
+
+                    game.CoverImageUrl = "/images/" + fileName;
+                }
+
                 _db.Games.Update(game);
                 await _db.SaveChangesAsync();
-                TempData["Message"] = $"Game '{game.Title}' updated!";
+                TempData["Message"] = $"Product '{game.Title}' updated!";
                 return RedirectToAction("Games");
             }
 

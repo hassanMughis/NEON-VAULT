@@ -1,5 +1,5 @@
 @model Neon_vault.Models.Game
-@{ Layout = "_AdminLayout"; ViewData["Title"] = "Edit Game"; }
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Edit Product"; }
 
 <div class="flex min-h-screen">
     @await Html.PartialAsync("_AdminSidebar", "Games")
@@ -9,9 +9,10 @@
             <h1 class="font-outfit text-lg font-bold text-white">Edit: @Model.Title</h1>
         </header>
         <div class="p-6 max-w-2xl">
-            <form method="post" action="/Admin/EditGame/@Model.Id" class="bg-navy border border-slate-800/50 rounded-xl p-6 space-y-4">
+            <form method="post" action="/Admin/EditGame/@Model.Id" enctype="multipart/form-data" class="bg-navy border border-slate-800/50 rounded-xl p-6 space-y-4">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="CoverImageUrl" id="existing-cover-url" value="@Model.CoverImageUrl" />
                 <div>
                     <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Title</label>
                     <input type="text" name="Title" value="@Model.Title" required class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition" />
@@ -41,11 +42,50 @@
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Cover Image URL</label>
-                    <input type="text" name="CoverImageUrl" value="@Model.CoverImageUrl" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition" />
+                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Category</label>
+                    <select name="Category" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition">
+                        @if (Model.Category == "Hardware")
+                        {
+                            <option value="Game">Game</option>
+                            <option value="Hardware" selected>Hardware</option>
+                        }
+                        else
+                        {
+                            <option value="Game" selected>Game</option>
+                            <option value="Hardware">Hardware</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Cover Image (leave empty to keep current)</label>
+                    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+                    {
+                        <div class="mb-3">
+                            <img src="@Model.CoverImageUrl" alt="Current cover" class="h-32 w-auto object-cover rounded-lg border border-slate-800/50" />
+                            <p class="text-[10px] text-brand/40 mt-1">Current image</p>
+                        </div>
+                    }
+                    <input type="file" name="CoverImage" accept="image/*" id="cover-image-input" class="w-full bg-white/5 border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-accent/20 file:text-accent hover:file:bg-accent hover:file:text-navy-deep" />
+                    <div id="image-preview" class="mt-3 hidden">
+                        <img id="preview-img" src="" alt="Preview" class="h-40 w-auto object-cover rounded-lg border border-slate-800/50" />
+                    </div>
                 </div>
                 <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all">Save Changes</button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('cover-image-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('preview-img').src = ev.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>

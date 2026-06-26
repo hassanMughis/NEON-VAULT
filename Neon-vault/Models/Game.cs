@@ -28,6 +28,9 @@ namespace Neon_vault.Models
         [MaxLength(200)]
         public string Developer { get; set; } = string.Empty;
 
+        [MaxLength(50)]
+        public string Category { get; set; } = "Game";
+
         [MaxLength(500)]
         public string CoverImageUrl { get; set; } = string.Empty;
     }

@@ -1,126 +1,152 @@
 @model List<Neon_vault.Models.Game>
 @{
     ViewData["Title"] = "Store";
+    var allGames = ViewBag.AllGames as List<Neon_vault.Models.Game> ?? new List<Neon_vault.Models.Game>();
+    var games = allGames.Where(g => g.Category != "Hardware").ToList();
+    var hardware = allGames.Where(g => g.Category == "Hardware").ToList();
+    
+    var selectedGenre = ViewBag.SelectedGenre as string ?? "All";
+    var search = ViewBag.Search as string ?? "";
 }
 
 @section Styles {
 <style>
     .game-card { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s; }
-    .game-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 40px rgba(221, 183, 255, 0.15); }
+    .game-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 40px rgba(221, 183, 255, 0.15); border-color: rgba(221, 183, 255, 0.25); }
     .game-card:hover .card-overlay { opacity: 1; }
-    .shelf-scroll { scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
-    .shelf-scroll::-webkit-scrollbar { display: none; }
-    .hero-banner { animation: fadeInUp 0.8s ease-out; }
-    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     .sidebar-link { transition: all 0.2s; }
     .sidebar-link:hover { background: rgba(221, 183, 255, 0.08); color: #DDB7FF; padding-left: 1.25rem; }
     .sidebar-link.active { background: rgba(221, 183, 255, 0.12); color: #DDB7FF; border-left: 3px solid #DDB7FF; }
 </style>
 }
 
-<div class="flex min-h-[calc(100vh-64px)]">
+<div class="flex flex-col lg:flex-row min-h-[calc(100vh-64px)]">
     <!-- Sidebar -->
-    <aside class="w-56 bg-navy-deep border-r border-slate-800/50 flex flex-col py-6 px-0 shrink-0 hidden lg:flex">
+    <aside class="w-full lg:w-64 bg-navy-deep border-b lg:border-r lg:border-b-0 border-slate-800/50 flex flex-col py-6 px-0 shrink-0">
         <div class="px-5 mb-6">
             <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Browse</h3>
             <nav class="flex flex-col gap-1">
-                <a href="/Store" class="sidebar-link active flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg">
+                <a href="/Store" class="sidebar-link @(selectedGenre == "All" && string.IsNullOrEmpty(search) ? "active" : "") flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg text-brand/60">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    Home
+                    All Products
                 </a>
-                <a href="/Store/AllGames" class="sidebar-link flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg">
+                <a href="/Store?genre=Games" class="sidebar-link @(selectedGenre == "Games" ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-                    All Games
+                    Digital Games
+                </a>
+                <a href="/Store?genre=Hardware" class="sidebar-link @(selectedGenre == "Hardware" ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
+                    Hardware Components
                 </a>
             </nav>
         </div>
+
         <div class="px-5 mb-6">
-            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Categories</h3>
+            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Games by Genre</h3>
             <nav class="flex flex-col gap-1">
-                @foreach (var genre in Model.Select(g => g.Genre).Distinct().OrderBy(g => g))
+                @foreach (var genre in games.Select(g => g.Genre).Distinct().OrderBy(g => g))
                 {
-                    <a href="/Store/AllGames?genre=@genre" class="sidebar-link flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg">
+                    <a href="/Store?genre=@genre" class="sidebar-link @(selectedGenre == genre ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg">
                         <span class="w-2 h-2 rounded-full bg-accent/60"></span> @genre
+                    </a>
+                }
+            </nav>
+        </div>
+
+        <div class="px-5 mb-6">
+            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Hardware by Type</h3>
+            <nav class="flex flex-col gap-1">
+                @foreach (var type in hardware.Select(g => g.Genre).Distinct().OrderBy(g => g))
+                {
+                    <a href="/Store?genre=@type" class="sidebar-link @(selectedGenre == type ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> @type
                     </a>
                 }
             </nav>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto">
-        <!-- Hero Banner -->
-        <section class="hero-banner relative mx-6 mt-6 rounded-2xl overflow-hidden h-[340px] group cursor-pointer">
-            <img src="/images/hero_banner.png" alt="Featured Game" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div class="absolute inset-0 bg-gradient-to-r from-navy/90 via-navy/50 to-transparent"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-transparent"></div>
-            @if (Model.Any())
-            {
-                var featured = Model.OrderByDescending(g => g.Price).First();
-                <div class="absolute bottom-0 left-0 p-8 z-10 max-w-lg">
-                    <span class="inline-block bg-accent/20 border border-accent/30 text-accent text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">🔥 Featured</span>
-                    <h1 class="font-sora text-3xl font-extrabold text-white leading-tight mb-2">@featured.Title</h1>
-                    <p class="text-sm text-brand/60 leading-relaxed mb-4">@featured.Description.Substring(0, Math.Min(featured.Description.Length, 120))...</p>
-                    <div class="flex items-center gap-3">
-                        <a href="/Store/ProductDetails/@featured.Id" class="bg-accent text-navy-deep font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-accent-dark hover:text-white transition-all hover:shadow-[0_0_20px_rgba(221,183,255,0.4)]">Buy Now — $@featured.Price.ToString("F2")</a>
-                        <form method="post" action="/Cart/AddToCart" class="inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="gameId" value="@featured.Id" />
-                            <input type="hidden" name="returnUrl" value="/Store" />
-                            <button type="submit" class="bg-white/10 border border-white/20 text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-white/20 transition">🛒 Add to Cart</button>
-                        </form>
-                    </div>
-                </div>
-            }
-        </section>
-
-        <!-- All Games Shelf -->
-        <section class="px-6 mt-8">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="font-outfit text-xl font-bold text-white">🎮 Our Catalog</h2>
-                <a href="/Store/AllGames" class="text-sm text-accent hover:text-accent-dark transition flex items-center gap-1">
-                    View All <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-                </a>
+    <!-- Main Content (Store Catalog) -->
+    <div class="flex-1 overflow-y-auto px-4 lg:px-8 py-8">
+        <!-- Search and Filter Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-navy-deep border border-slate-800/50 p-4 rounded-xl">
+            <div>
+                <h1 class="font-sora text-2xl font-extrabold text-white">@(selectedGenre == "All" ? "All Products" : selectedGenre)</h1>
+                <p class="text-sm text-brand/50 mt-1">Showing @Model.Count result@(Model.Count != 1 ? "s" : "")</p>
             </div>
-            <div class="shelf-scroll flex gap-4 overflow-x-auto pb-2">
+            <form method="get" action="/Store" class="flex flex-wrap items-center gap-3">
+                <div class="relative min-w-[200px]">
+                    <select name="genre" class="w-full bg-navy-deep border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none transition focus:border-accent appearance-none cursor-pointer" onchange="this.form.submit()">
+                        <option value="All" class="bg-navy-deep text-white" selected="@(selectedGenre == "All")">All Categories</option>
+                        <optgroup label="Main Categories" class="bg-navy text-accent font-bold">
+                            <option value="Games" class="bg-navy-deep text-brand" selected="@(selectedGenre == "Games")">Digital Games</option>
+                            <option value="Hardware" class="bg-navy-deep text-brand" selected="@(selectedGenre == "Hardware")">Hardware & Parts</option>
+                        </optgroup>
+                        <optgroup label="Game Genres" class="bg-navy text-accent font-bold">
+                            @foreach (var g in games.Select(x => x.Genre).Distinct().OrderBy(x => x))
+                            {
+                                <option value="@g" class="bg-navy-deep text-brand" selected="@(selectedGenre == g)">@g</option>
+                            }
+                        </optgroup>
+                        <optgroup label="Hardware Types" class="bg-navy text-accent font-bold">
+                            @foreach (var g in hardware.Select(x => x.Genre).Distinct().OrderBy(x => x))
+                            {
+                                <option value="@g" class="bg-navy-deep text-brand" selected="@(selectedGenre == g)">@g</option>
+                            }
+                        </optgroup>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 fill-white pointer-events-none" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                </div>
+                
+                <div class="relative w-full sm:w-64">
+                    <input type="text" name="search" value="@search" placeholder="Search store..." class="w-full bg-white/10 border border-slate-800/50 rounded-lg py-2.5 pl-10 pr-4 text-white text-sm outline-none transition focus:border-accent placeholder:text-brand/40" />
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 fill-brand/40" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+                <button type="submit" class="bg-accent/20 border border-accent/30 text-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-accent hover:text-navy-deep transition">Search</button>
+            </form>
+        </div>
+
+        <!-- Games Grid -->
+        @if (!Model.Any())
+        {
+            <div class="text-center py-20 bg-navy-deep border border-slate-800/50 rounded-xl mt-4">
+                <span class="text-4xl mb-4 block">🔍</span>
+                <h2 class="font-outfit text-xl font-bold text-white mb-2">No products found</h2>
+                <p class="text-sm text-brand/50">Try adjusting your search or filters.</p>
+                <a href="/Store" class="inline-block mt-4 bg-accent/20 border border-accent/30 text-accent text-sm font-semibold px-6 py-2 rounded-lg hover:bg-accent hover:text-navy-deep transition">Clear Filters</a>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 @foreach (var game in Model)
                 {
-                    <div class="game-card relative bg-navy-deep border border-slate-800/50 rounded-xl overflow-hidden min-w-[200px] w-[200px] flex flex-col group">
-                        <a href="/Store/ProductDetails/@game.Id" class="relative h-[260px] overflow-hidden block">
-                            <img src="@game.CoverImageUrl" alt="@game.Title" class="w-full h-full object-cover" />
+                    <div class="game-card bg-navy-deep border border-slate-800/50 rounded-xl overflow-hidden flex flex-col group">
+                        <a href="/Store/ProductDetails/@game.Id" class="relative h-[220px] sm:h-[260px] overflow-hidden block">
+                            <img src="@game.CoverImageUrl" alt="@game.Title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div class="card-overlay absolute inset-0 bg-gradient-to-t from-navy/90 to-transparent opacity-0 transition-opacity duration-300 flex items-end p-3">
                                 <span class="text-xs text-accent font-semibold">View Details →</span>
                             </div>
                         </a>
-                        <div class="p-3 flex flex-col gap-1.5 flex-1">
-                            <span class="text-[10px] text-accent/80 font-semibold uppercase tracking-wider">@game.Genre</span>
-                            <h3 class="text-sm font-semibold text-white truncate">@game.Title</h3>
-                            <span class="text-sm font-bold text-white">$@game.Price.ToString("F2")</span>
-                            <form method="post" action="/Cart/AddToCart" class="mt-auto">
+                        <div class="p-3 sm:p-4 flex flex-col gap-1.5 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] text-accent/80 font-semibold uppercase tracking-wider">@game.Genre</span>
+                                @if (game.Category == "Hardware") {
+                                    <span class="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded font-bold">Hardware</span>
+                                }
+                            </div>
+                            <h3 class="text-sm font-semibold text-white line-clamp-2">@game.Title</h3>
+                            <span class="text-sm font-bold text-white mt-auto pt-2">$@game.Price.ToString("F2")</span>
+                            <form method="post" action="/Cart/AddToCart" class="mt-2">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="gameId" value="@game.Id" />
-                                <input type="hidden" name="returnUrl" value="/Store" />
-                                <button type="submit" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-1.5 rounded-lg hover:bg-accent hover:text-navy-deep transition mt-1">Add to Cart</button>
+                                <input type="hidden" name="returnUrl" value="/Store?genre=@selectedGenre&search=@search" />
+                                <button type="submit" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-2 rounded-lg hover:bg-accent hover:text-navy-deep transition">Add to Cart</button>
                             </form>
                         </div>
                     </div>
                 }
             </div>
-        </section>
-
-        <!-- Special Offers Banner -->
-        <section class="px-6 mt-8 mb-10">
-            <div class="relative bg-gradient-to-r from-purple-900/40 via-accent/10 to-purple-900/40 border border-accent/20 rounded-2xl p-8 overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
-                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div>
-                        <span class="text-accent text-xs font-bold uppercase tracking-widest">⚡ Browse Our Collection</span>
-                        <h2 class="font-sora text-2xl font-extrabold text-white mt-2">@Model.Count Games Available</h2>
-                        <p class="text-sm text-brand/50 mt-1">Discover your next favorite game in our curated collection.</p>
-                    </div>
-                    <a href="/Store/AllGames" class="bg-accent text-navy-deep font-bold text-sm px-8 py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all shrink-0">Browse All</a>
-                </div>
-            </div>
-        </section>
+        }
     </div>
 </div>

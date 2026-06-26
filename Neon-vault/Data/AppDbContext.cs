@@ -16,6 +16,9 @@ namespace Neon_vault.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<LibraryItem> LibraryItems => Set<LibraryItem>();
+        public DbSet<ChatUser> ChatUsers => Set<ChatUser>();
+        public DbSet<Channel> Channels => Set<Channel>();
+        public DbSet<Message> Messages => Set<Message>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -123,6 +126,54 @@ namespace Neon_vault.Data
                     ReleaseDate = new DateTime(2026, 5, 30),
                     Developer = "Protocol Games",
                     CoverImageUrl = "/images/game_card_8.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567801"),
+                    Title = "Nexus Pro Core Console",
+                    Description = "The ultimate next-gen experience. 4K 120FPS with a 1TB SSD. Discover premium consoles and maximum immersion.",
+                    Price = 499.99m,
+                    Genre = "Console",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2025, 11, 15),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_1.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567802"),
+                    Title = "Tactical Comm Pack",
+                    Description = "Pro headset paired with competitive layout controller. 7.1 Surround Sound and Wireless connectivity.",
+                    Price = 249.99m,
+                    Genre = "Headset",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2026, 1, 10),
+                    Developer = "Void Interactive Gear",
+                    CoverImageUrl = "/images/hardware_2.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567803"),
+                    Title = "Cyber Horizon Elite Controller",
+                    Description = "Ultra-responsive controller with customizable paddles, trigger stops, and haptic feedback.",
+                    Price = 149.99m,
+                    Genre = "Controller",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2026, 3, 5),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_3.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567804"),
+                    Title = "Neon RTX 6090 GPU",
+                    Description = "The most powerful graphics card in the world. Dominate the cyberpunk landscape with true path tracing.",
+                    Price = 1599.99m,
+                    Genre = "Component",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2025, 12, 20),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_4.png"
                 }
             );
         }
