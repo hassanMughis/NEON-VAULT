@@ -51,7 +51,7 @@ To get a local copy up and running, follow these simple steps:
 
 This project was built collaboratively. Below are the team members and their primary areas of focus:
 
-*   **[Rokxany] Hamza Nizamani:** E-Commerce Logic & Session Management (Full Stack)
+*   **Hamza Nizamani:** E-Commerce Logic & Session Management (Full Stack)
 *   **Hassan Mughis:** Admin Systems & User Integration (Full Stack)
 *   **Muhammad Abdullah:** Database & Backend Architecture (Lead Backend)
 *   **Bilawal Feroze:** UI/UX Design & Frontend Development (Lead Frontend)
