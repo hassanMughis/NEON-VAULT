@@ -99,28 +99,33 @@
                     <span id="cart-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center hidden">0</span>
                 </a>
 
-                @if (isAdmin)
-                {
-                    <a href="/Admin/Dashboard" class="bg-transparent border-none cursor-pointer w-[38px] h-[38px] rounded-full flex items-center justify-center text-brand transition hover:bg-white/10 hover:text-accent" title="Admin Panel">
-                        <svg class="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-                        </svg>
-                    </a>
-                }
-
                 @if (!string.IsNullOrWhiteSpace(currentUserName))
                 {
-                    <a href="/Account/Settings" class="flex items-center gap-2 rounded-full border border-slate-800/50 bg-white/5 px-3 py-2 text-sm text-white transition hover:bg-white/10">
-                        @if (!string.IsNullOrWhiteSpace(currentUserProfileImageUrl))
-                        {
-                            <img src="@currentUserProfileImageUrl" alt="Profile" class="h-7 w-7 rounded-full object-cover" />
-                        }
-                        else
-                        {
-                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">@currentUserName.Substring(0, 1).ToUpperInvariant()</span>
-                        }
-                        <span class="max-w-[100px] truncate">@currentUserName</span>
-                    </a>
+                    <div class="relative" id="profile-menu-root">
+                        <button type="button" id="profile-menu-button" class="flex items-center gap-2 rounded-full border border-slate-800/50 bg-white/5 px-3 py-2 text-sm text-white transition hover:bg-white/10" aria-expanded="false" aria-controls="profile-menu">
+                            @if (!string.IsNullOrWhiteSpace(currentUserProfileImageUrl))
+                            {
+                                <img src="@currentUserProfileImageUrl" alt="Profile" class="h-7 w-7 rounded-full object-cover" />
+                            }
+                            else
+                            {
+                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">@currentUserName.Substring(0, 1).ToUpperInvariant()</span>
+                            }
+                            <span class="max-w-[100px] truncate">@currentUserName</span>
+                            <svg class="h-3.5 w-3.5 fill-current text-brand/60" viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" />
+                            </svg>
+                        </button>
+
+                        <div id="profile-menu" class="absolute right-0 top-[calc(100%+10px)] z-[150] hidden w-48 overflow-hidden rounded-xl border border-slate-800/70 bg-navy-deep/95 py-2 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur">
+                            <a href="/Account/Settings" class="block px-4 py-2.5 text-sm text-brand/80 transition hover:bg-white/10 hover:text-accent">Settings</a>
+                            @if (isAdmin)
+                            {
+                                <a href="/Admin/Dashboard" class="block px-4 py-2.5 text-sm text-brand/80 transition hover:bg-white/10 hover:text-accent">Admin</a>
+                            }
+                            <a href="/Admin/Logout" class="block px-4 py-2.5 text-sm text-brand/80 transition hover:bg-white/10 hover:text-red-400">Logout</a>
+                        </div>
+                    </div>
                 }
                 else
                 {
@@ -202,6 +207,36 @@
         if (toast) {
             setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s'; }, 3000);
             setTimeout(() => toast.remove(), 3500);
+        }
+
+        const profileMenuRoot = document.getElementById('profile-menu-root');
+        const profileMenuButton = document.getElementById('profile-menu-button');
+        const profileMenu = document.getElementById('profile-menu');
+
+        if (profileMenuRoot && profileMenuButton && profileMenu) {
+            const closeProfileMenu = () => {
+                profileMenu.classList.add('hidden');
+                profileMenuButton.setAttribute('aria-expanded', 'false');
+            };
+
+            profileMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isOpen = !profileMenu.classList.contains('hidden');
+                profileMenu.classList.toggle('hidden', isOpen);
+                profileMenuButton.setAttribute('aria-expanded', String(!isOpen));
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!profileMenuRoot.contains(event.target)) {
+                    closeProfileMenu();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeProfileMenu();
+                }
+            });
         }
     </script>
 
