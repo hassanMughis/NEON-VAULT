@@ -1,9 +1,10 @@
 
 @{
     var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").ToLowerInvariant();
+    var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
 
-    string NavLinkClasses(string controllerName) =>
-        currentController == controllerName.ToLowerInvariant()
+    string NavLinkClasses(string controllerName, string actionName = "index") =>
+        (currentController == controllerName.ToLowerInvariant() && currentAction == actionName.ToLowerInvariant())
             ? "text-sm font-semibold text-white relative flex items-center h-full px-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-accent after:rounded-t-[3px] after:shadow-[0_-2px_10px_rgba(221,183,255,0.6)]"
             : "text-sm font-semibold text-brand/50 relative flex items-center h-full px-1 transition hover:text-brand";
 }
@@ -65,22 +66,21 @@
         <!-- Top Navigation Bar -->
         <header class="h-16 bg-navy border-b border-slate-800/50 shadow-header-glow flex items-center justify-between px-6 sticky top-0 z-[100]">
             <div class="flex items-center gap-10">
-                <a href="/Store" class="font-sora text-[26px] font-extrabold text-accent uppercase tracking-[1.5px] transition flex items-center gap-2 hover:text-accent-dark hover:[text-shadow:0_0_12px_rgba(221,183,255,0.4)]">
-                    <svg class="w-[22px] h-[22px] fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2L2 22h20L12 2zm0 3.99L18.49 19H5.51L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/>
-                    </svg>
-                    <span>Neon Vault</span>
+                <a href="/" class="flex items-center gap-2 transition hover:opacity-80">
+                    <img src="/images/neon_vault_logo.png?v=@DateTime.Now.Ticks" alt="Neon Vault" class="h-14 w-auto drop-shadow-[0_0_8px_rgba(221,183,255,0.3)]" />
                 </a>
 
                 <nav class="hidden md:flex items-center gap-6 h-16">
-                    <a href="/Store" class="@NavLinkClasses("Store")">Store</a>
-                    <a href="/Library" class="@NavLinkClasses("Library")">Library</a>
+                    <a href="/Store" class="@NavLinkClasses("Store", "index")">Store</a>
+                    <a href="/Library" class="@NavLinkClasses("Library", "index")">Library</a>
+                    <a href="/Community" class="@NavLinkClasses("Community", "index")">Community</a>
+                    <a href="/Home/Contact" class="@NavLinkClasses("Home", "contact")">Support</a>
                 </nav>
             </div>
 
             <div class="flex items-center gap-4">
                 <!-- Search Bar -->
-                <form method="get" action="/Store/AllGames" class="relative w-40 md:w-60">
+                <form method="get" action="/Store" class="relative w-40 md:w-60">
                     <input type="text" name="search" placeholder="Search games..." class="peer w-full bg-white/10 border border-slate-800/50 rounded-full py-2 pl-9 pr-4 text-white text-[13px] outline-none transition focus:border-accent focus:bg-white/15 focus:shadow-[0_0_8px_rgba(221,183,255,0.25)] placeholder:text-brand/50" />
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 fill-brand/50 pointer-events-none transition peer-focus:fill-accent" viewBox="0 0 24 24">
                         <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -123,11 +123,8 @@
 
                 <!-- Brand Column -->
                 <div class="flex flex-col gap-4 max-w-[280px]">
-                    <a href="/Store" class="font-sora text-[22px] font-extrabold text-accent uppercase tracking-[1.5px] transition flex items-center gap-2 hover:text-accent-dark hover:[text-shadow:0_0_12px_rgba(221,183,255,0.4)]">
-                        <svg class="w-[22px] h-[22px] fill-current" viewBox="0 0 24 24">
-                            <path d="M12 2L2 22h20L12 2zm0 3.99L18.49 19H5.51L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"/>
-                        </svg>
-                        <span>Neon Vault</span>
+                    <a href="/" class="flex items-center gap-2 transition hover:opacity-80">
+                        <img src="/images/neon_vault_logo.png?v=@DateTime.Now.Ticks" alt="Neon Vault" class="h-12 w-auto drop-shadow-[0_0_8px_rgba(221,183,255,0.3)]" />
                     </a>
                     <p class="text-[13px] text-brand/50 leading-[1.7]">Your ultimate destination for premium gaming experiences. Discover, play, and connect with the world's best games.</p>
                 </div>
@@ -137,7 +134,7 @@
                     <div class="flex flex-col gap-3 min-w-[120px]">
                         <div class="font-outfit text-xs font-bold text-white tracking-[1.5px] uppercase mb-1">Store</div>
                         <a href="/Store" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">Browse Games</a>
-                        <a href="/Store/AllGames" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">All Games</a>
+                        <a href="/Store" class="text-[13px] text-brand/50 no-underline transition hover:text-accent">All Products</a>
                     </div>
                     <div class="flex flex-col gap-3 min-w-[120px]">
                         <div class="font-outfit text-xs font-bold text-white tracking-[1.5px] uppercase mb-1">Account</div>

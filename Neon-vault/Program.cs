@@ -19,6 +19,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Auto-apply migrations and seed database on startup
@@ -45,7 +47,9 @@ app.MapStaticAssets();
 // Default route: Home redirects to Store
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Store}/{action=Index}/{id?}")
+    pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapHub<Neon_vault.Hubs.ChatHub>("/chatHub");
 
 app.Run();

@@ -1,8 +1,122 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model List<Neon_vault.Models.Game>
+@{
+    ViewData["Title"] = "Welcome to Neon Vault";
+    var games = Model.Where(g => g.Category != "Hardware").ToList();
+    var hardware = Model.Where(g => g.Category == "Hardware").ToList();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>This is begining to something new Follow this project on <a href="https://github.com/hassanMughis/NEON-VAULT/tree/main">making a game store </a>.</p>
+@section Styles {
+<style>
+    .game-card { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s; }
+    .game-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 40px rgba(221, 183, 255, 0.15); }
+    .game-card:hover .card-overlay { opacity: 1; }
+    .shelf-scroll { scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+    .shelf-scroll::-webkit-scrollbar { display: none; }
+    .hero-banner { animation: fadeInUp 0.8s ease-out; }
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+}
+
+<div class="w-full max-w-7xl mx-auto pb-16">
+    <!-- Hero Banner (Hardware Focused) -->
+    <section class="hero-banner relative mx-4 lg:mx-8 mt-6 rounded-2xl overflow-hidden h-[450px] flex items-center justify-center text-center">
+        <img src="/images/hardware_1.png" alt="Featured Hardware" class="absolute inset-0 w-full h-full object-cover object-center opacity-40" />
+        <div class="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent"></div>
+        <div class="relative z-10 max-w-2xl px-4 flex flex-col items-center">
+            <img src="/images/neon_vault_logo.png?v=@DateTime.Now.Ticks" alt="Neon Vault" class="w-24 h-24 md:w-32 md:h-32 object-contain mb-4 drop-shadow-[0_0_15px_rgba(221,183,255,0.4)]" />
+            <span class="text-accent text-xs font-bold uppercase tracking-[3px] mb-3">Welcome to Neon Vault</span>
+            <h1 class="font-sora text-4xl lg:text-5xl font-extrabold text-white mb-4">Elevate Your Arsenal</h1>
+            <p class="text-brand/70 text-sm lg:text-base mb-8">Discover premium consoles, ultra-responsive controllers, and high-fidelity audio gear designed for maximum immersion.</p>
+            <div class="flex flex-col sm:flex-row gap-4 mt-2">
+                <a href="/Store" class="bg-accent text-navy-deep font-bold text-sm px-8 py-3 rounded-full hover:bg-accent-dark transition-all shadow-[0_0_20px_rgba(221,183,255,0.3)]">
+                    Enter the Store
+                </a>
+                <a href="/Store?genre=Hardware" class="bg-white/10 text-white font-bold text-sm px-8 py-3 rounded-full hover:bg-white/20 transition-all border border-white/5">
+                    View Hardware
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Featured Bundles (Hardware) -->
+    <section id="hardware-section" class="px-4 lg:px-8 mt-10">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h2 class="font-outfit text-xl font-bold text-white">Featured Hardware</h2>
+                <p class="text-xs text-brand/50 mt-1">Maximum power, maximum value.</p>
+            </div>
+            <a href="/Store?genre=Hardware" class="text-sm text-accent hover:text-accent-dark transition flex items-center gap-1">
+                View All <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @foreach(var item in hardware.Take(2))
+            {
+                <div class="bg-navy-deep border border-slate-800/50 rounded-xl overflow-hidden flex flex-col relative group">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="@item.CoverImageUrl" alt="@item.Title" class="w-full h-full object-cover transition duration-700 group-hover:scale-105" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-navy-deep to-transparent"></div>
+                    </div>
+                    <div class="p-6 relative z-10 -mt-20 flex flex-col h-full">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="bg-navy-deep border border-accent/30 text-accent text-[10px] font-bold px-2 py-1 rounded">@item.Genre</span>
+                            <span class="bg-navy-deep border border-brand/20 text-brand text-[10px] font-bold px-2 py-1 rounded">PRO LEVEL</span>
+                        </div>
+                        <h3 class="font-sora text-xl font-bold text-white mb-2">@item.Title</h3>
+                        <p class="text-sm text-brand/60 mb-6 flex-1">@item.Description</p>
+                        
+                        <div class="flex items-end justify-between mt-auto">
+                            <div>
+                                <span class="block text-2xl font-bold text-white">$@item.Price.ToString("F2")</span>
+                            </div>
+                            <form method="post" action="/Cart/AddToCart">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="gameId" value="@item.Id" />
+                                <input type="hidden" name="returnUrl" value="/" />
+                                <button type="submit" class="bg-accent/20 text-accent hover:bg-accent hover:text-navy-deep p-3 rounded-full transition">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Digital Games Shelf -->
+    <section class="px-4 lg:px-8 mt-12 mb-16">
+        <div class="flex items-center justify-between mb-5">
+            <h2 class="font-outfit text-xl font-bold text-white">🎮 Featured Titles</h2>
+            <a href="/Store?genre=Games" class="text-sm text-accent hover:text-accent-dark transition flex items-center gap-1">
+                View All <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+            </a>
+        </div>
+        <div class="shelf-scroll flex gap-4 overflow-x-auto pb-4 snap-x">
+            @foreach (var game in games)
+            {
+                <div class="game-card relative bg-navy-deep border border-slate-800/50 rounded-xl overflow-hidden min-w-[200px] w-[200px] flex flex-col group snap-start">
+                    <a href="/Store/ProductDetails/@game.Id" class="relative h-[260px] overflow-hidden block">
+                        <img src="@game.CoverImageUrl" alt="@game.Title" class="w-full h-full object-cover" />
+                        <div class="card-overlay absolute inset-0 bg-gradient-to-t from-navy/90 to-transparent opacity-0 transition-opacity duration-300 flex items-end p-3">
+                            <span class="text-xs text-accent font-semibold">View Details →</span>
+                        </div>
+                    </a>
+                    <div class="p-3 flex flex-col gap-1.5 flex-1">
+                        <span class="text-[10px] text-accent/80 font-semibold uppercase tracking-wider">@game.Genre</span>
+                        <h3 class="text-sm font-semibold text-white truncate">@game.Title</h3>
+                        <span class="text-sm font-bold text-white">$@game.Price.ToString("F2")</span>
+                        <form method="post" action="/Cart/AddToCart" class="mt-auto">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="gameId" value="@game.Id" />
+                            <input type="hidden" name="returnUrl" value="/" />
+                            <button type="submit" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-1.5 rounded-lg hover:bg-accent hover:text-navy-deep transition mt-1">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
 </div>

@@ -16,15 +16,8 @@ namespace Neon_vault.Controllers
             _db = db;
         }
 
-        /// <summary>Store home — displays all games in shelves.</summary>
-        public async Task<IActionResult> Index()
-        {
-            var games = await _db.Games.OrderBy(g => g.Title).ToListAsync();
-            return View(games);
-        }
-
-        /// <summary>All games page with search and genre filter support.</summary>
-        public async Task<IActionResult> AllGames(string? search, string? genre)
+        /// <summary>Store catalog page with search and category filtering.</summary>
+        public async Task<IActionResult> Index(string? search, string? genre)
         {
             var query = _db.Games.AsQueryable();
 
@@ -33,17 +26,25 @@ namespace Neon_vault.Controllers
                 query = query.Where(g => g.Title.Contains(search) || g.Description.Contains(search));
             }
 
-            if (!string.IsNullOrWhiteSpace(genre) && genre != "All")
+            if (!string.IsNullOrWhiteSpace(genre) && genre != "All" && genre != "Home")
             {
-                query = query.Where(g => g.Genre == genre);
+                if (genre == "Games") {
+                    query = query.Where(g => g.Category == "Game");
+                } else if (genre == "Hardware") {
+                    query = query.Where(g => g.Category == "Hardware");
+                } else {
+                    query = query.Where(g => g.Genre == genre);
+                }
             }
 
             var games = await query.OrderBy(g => g.Title).ToListAsync();
-            var genres = await _db.Games.Select(g => g.Genre).Distinct().OrderBy(g => g).ToListAsync();
+            
+            // To build the sidebar we need all games
+            var allGames = await _db.Games.ToListAsync();
+            ViewBag.AllGames = allGames;
 
             ViewBag.Search = search;
             ViewBag.SelectedGenre = genre ?? "All";
-            ViewBag.Genres = genres;
 
             return View(games);
         }
