@@ -67,11 +67,17 @@ namespace Neon_vault.Controllers
         /// <summary>Helper to get or create a persistent session identifier.</summary>
         private string GetSessionId()
         {
-            var sessionId = HttpContext.Session.GetString("CartSessionId");
+            var sessionId = Request.Cookies["CartSessionId"];
             if (string.IsNullOrEmpty(sessionId))
             {
                 sessionId = Guid.NewGuid().ToString();
-                HttpContext.Session.SetString("CartSessionId", sessionId);
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(30),
+                    HttpOnly = true,
+                    IsEssential = true
+                };
+                Response.Cookies.Append("CartSessionId", sessionId, cookieOptions);
             }
             return sessionId;
         }
