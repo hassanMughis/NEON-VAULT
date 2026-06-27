@@ -33,5 +33,8 @@ namespace Neon_vault.Models
 
         [MaxLength(500)]
         public string CoverImageUrl { get; set; } = string.Empty;
+
+        [MaxLength(2000)]
+        public string? AdditionalImageUrls { get; set; } = string.Empty;
     }
 }

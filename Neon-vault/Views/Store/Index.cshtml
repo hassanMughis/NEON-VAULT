@@ -7,6 +7,9 @@
     
     var selectedGenre = ViewBag.SelectedGenre as string ?? "All";
     var search = ViewBag.Search as string ?? "";
+    var sortBy = ViewBag.SortBy as string ?? "default";
+    var minPrice = ViewBag.MinPrice as decimal?;
+    var maxPrice = ViewBag.MaxPrice as decimal?;
 }
 
 @section Styles {
@@ -17,52 +20,137 @@
     .sidebar-link { transition: all 0.2s; }
     .sidebar-link:hover { background: rgba(221, 183, 255, 0.08); color: #DDB7FF; padding-left: 1.25rem; }
     .sidebar-link.active { background: rgba(221, 183, 255, 0.12); color: #DDB7FF; border-left: 3px solid #DDB7FF; }
+
+    /* Collapsible Sidebar Styles */
+    #store-sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    #store-sidebar.collapsed { width: 5rem !important; }
+    #store-sidebar.collapsed .sidebar-text,
+    #store-sidebar.collapsed h3,
+    #store-sidebar.collapsed .arrow-icon,
+    #store-sidebar.collapsed .collapsible-group { display: none !important; }
+    #store-sidebar.collapsed .px-5 { padding-left: 0.75rem; padding-right: 0.75rem; text-align: center; }
+    #store-sidebar.collapsed .sidebar-link { justify-content: center; padding-left: 0; padding-right: 0; }
+    #store-sidebar.collapsed .sidebar-link svg { margin: 0 !important; }
+
+    .section-collapsed {
+        display: none !important;
+    }
 </style>
 }
 
-<div class="flex flex-col lg:flex-row min-h-[calc(100vh-64px)]">
+<form id="filter-form" method="get" action="/Store" class="flex flex-col lg:flex-row min-h-[calc(100vh-64px)] w-full">
+    <input type="hidden" id="filter-genre" name="genre" value="@selectedGenre" />
+
     <!-- Sidebar -->
-    <aside class="w-full lg:w-64 bg-navy-deep border-b lg:border-r lg:border-b-0 border-slate-800/50 flex flex-col py-6 px-0 shrink-0">
-        <div class="px-5 mb-6">
-            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Browse</h3>
-            <nav class="flex flex-col gap-1">
-                <a href="/Store" class="sidebar-link @(selectedGenre == "All" && string.IsNullOrEmpty(search) ? "active" : "") flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg text-brand/60">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    All Products
-                </a>
-                <a href="/Store?genre=Games" class="sidebar-link @(selectedGenre == "Games" ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-                    Digital Games
-                </a>
-                <a href="/Store?genre=Hardware" class="sidebar-link @(selectedGenre == "Hardware" ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
-                    Hardware Components
-                </a>
-            </nav>
+    <aside id="store-sidebar" class="w-full lg:w-64 bg-navy-deep border-b lg:border-r lg:border-b-0 border-slate-800/50 flex flex-col py-6 px-0 shrink-0 relative">
+        
+        <!-- Sidebar Toggle Arrow (Floating on the right border) -->
+        <div role="button" onclick="event.preventDefault(); toggleSidebar();" class="absolute top-4 -right-3 w-6 h-6 bg-accent text-navy-deep rounded-full flex items-center justify-center border border-slate-800 shadow-[0_0_10px_rgba(221,183,255,0.3)] z-50 hover:bg-accent-dark transition-all cursor-pointer">
+            <svg id="sidebar-toggle-icon" class="w-3 h-3 fill-current transition-transform duration-300" viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
         </div>
 
-        <div class="px-5 mb-6">
-            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Games by Genre</h3>
-            <nav class="flex flex-col gap-1">
-                @foreach (var genre in games.Select(g => g.Genre).Distinct().OrderBy(g => g))
-                {
-                    <a href="/Store?genre=@genre" class="sidebar-link @(selectedGenre == genre ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg">
-                        <span class="w-2 h-2 rounded-full bg-accent/60"></span> @genre
-                    </a>
-                }
-            </nav>
-        </div>
+        <!-- Sidebar Content Container -->
+        <div id="sidebar-content" class="flex flex-col gap-6 overflow-hidden">
+            
+            <!-- Category: Browse (Always visible, text collapses) -->
+            <div class="px-5">
+                <div class="flex items-center justify-between cursor-pointer group" onclick="toggleSection('section-browse')">
+                    <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px]">Browse</h3>
+                    <svg id="arrow-section-browse" class="arrow-icon w-4 h-4 fill-brand/40 group-hover:fill-accent transition-transform duration-300" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                    </svg>
+                </div>
+                <nav id="section-browse" class="flex flex-col gap-1 mt-4 transition-all duration-300">
+                    <button type="button" onclick="filterByGenre('All')" class="sidebar-link @(selectedGenre == "All" && string.IsNullOrEmpty(search) ? "active" : "") flex items-center gap-3 text-sm py-2.5 px-4 rounded-lg text-brand/60 text-left w-full">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span class="sidebar-text transition-opacity duration-300">All Products</span>
+                    </button>
+                    <button type="button" onclick="filterByGenre('Games')" class="sidebar-link @(selectedGenre == "Games" ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg text-left w-full">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                        <span class="sidebar-text transition-opacity duration-300">Digital Games</span>
+                    </button>
+                    <button type="button" onclick="filterByGenre('Hardware')" class="sidebar-link @(selectedGenre == "Hardware" ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2.5 px-4 rounded-lg text-left w-full">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
+                        <span class="sidebar-text transition-opacity duration-300">Hardware Components</span>
+                    </button>
+                </nav>
+            </div>
 
-        <div class="px-5 mb-6">
-            <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px] mb-4">Hardware by Type</h3>
-            <nav class="flex flex-col gap-1">
-                @foreach (var type in hardware.Select(g => g.Genre).Distinct().OrderBy(g => g))
-                {
-                    <a href="/Store?genre=@type" class="sidebar-link @(selectedGenre == type ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg">
-                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> @type
-                    </a>
-                }
-            </nav>
+            <!-- Category: Digital Games Accordion -->
+            <div class="px-5 collapsible-group">
+                <div class="flex items-center justify-between cursor-pointer group" onclick="toggleSection('section-games')">
+                    <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px]">Games by Genre</h3>
+                    <svg id="arrow-section-games" class="arrow-icon w-4 h-4 fill-brand/40 group-hover:fill-accent transition-transform duration-300 rotate-180" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                    </svg>
+                </div>
+                <nav id="section-games" class="flex flex-col gap-1 mt-4 transition-all duration-300">
+                    @foreach (var genre in games.Select(g => g.Genre).Distinct().OrderBy(g => g))
+                    {
+                        <button type="button" onclick="filterByGenre('@genre')" class="sidebar-link @(selectedGenre == genre ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg text-left w-full">
+                            <span class="w-2 h-2 rounded-full bg-accent/60 shrink-0"></span>
+                            <span class="sidebar-text">@genre</span>
+                        </button>
+                    }
+                </nav>
+            </div>
+
+            <!-- Category: Hardware Accordion -->
+            <div class="px-5 collapsible-group">
+                <div class="flex items-center justify-between cursor-pointer group" onclick="toggleSection('section-hardware')">
+                    <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px]">Hardware by Type</h3>
+                    <svg id="arrow-section-hardware" class="arrow-icon w-4 h-4 fill-brand/40 group-hover:fill-accent transition-transform duration-300 rotate-180" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                    </svg>
+                </div>
+                <nav id="section-hardware" class="flex flex-col gap-1 mt-4 transition-all duration-300">
+                    @foreach (var type in hardware.Select(g => g.Genre).Distinct().OrderBy(g => g))
+                    {
+                        <button type="button" onclick="filterByGenre('@type')" class="sidebar-link @(selectedGenre == type ? "active" : "") flex items-center gap-3 text-sm text-brand/60 py-2 px-4 rounded-lg text-left w-full">
+                            <span class="w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>
+                            <span class="sidebar-text">@type</span>
+                        </button>
+                    }
+                </nav>
+            </div>
+
+            <!-- Category: Price & Sort Filters -->
+            <div class="px-5 border-t border-slate-800/30 pt-6 collapsible-group">
+                <div class="flex items-center justify-between cursor-pointer group" onclick="toggleSection('section-filters')">
+                    <h3 class="font-outfit text-xs font-bold text-brand/40 uppercase tracking-[2px]">Filters</h3>
+                    <svg id="arrow-section-filters" class="arrow-icon w-4 h-4 fill-brand/40 group-hover:fill-accent transition-transform duration-300" viewBox="0 0 24 24">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                    </svg>
+                </div>
+                <div id="section-filters" class="flex flex-col gap-4 mt-4 transition-all duration-300">
+                    <div>
+                        <label class="text-[10px] uppercase tracking-wider text-brand/40 block mb-1">Sort By</label>
+                        <select name="sortBy" onchange="this.form.submit()" class="w-full bg-navy border border-slate-800/50 rounded-lg py-2 px-3 text-white text-xs outline-none focus:border-accent appearance-none cursor-pointer">
+                            <option value="default" selected="@(sortBy == "default")">Alphabetical</option>
+                            <option value="price_asc" selected="@(sortBy == "price_asc")">Price: Low to High</option>
+                            <option value="price_desc" selected="@(sortBy == "price_desc")">Price: High to Low</option>
+                            <option value="newest" selected="@(sortBy == "newest")">Release Date</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] uppercase tracking-wider text-brand/40 block mb-1">Price Range ($)</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="number" step="0.01" name="minPrice" placeholder="Min" value="@minPrice" class="w-full bg-navy border border-slate-800/50 rounded-lg py-1.5 px-3 text-white text-xs outline-none focus:border-accent" />
+                            <span class="text-brand/40 text-xs">—</span>
+                            <input type="number" step="0.01" name="maxPrice" placeholder="Max" value="@maxPrice" class="w-full bg-navy border border-slate-800/50 rounded-lg py-1.5 px-3 text-white text-xs outline-none focus:border-accent" />
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 bg-accent/20 border border-accent/30 text-accent text-xs font-semibold py-2 rounded-lg hover:bg-accent hover:text-navy-deep transition">Apply</button>
+                        <a href="/Store" class="flex-1 bg-white/5 border border-slate-800 text-brand/60 text-xs font-semibold py-2 rounded-lg hover:bg-white/10 hover:text-white transition text-center">Reset</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </aside>
 
@@ -74,24 +162,24 @@
                 <h1 class="font-sora text-2xl font-extrabold text-white">@(selectedGenre == "All" ? "All Products" : selectedGenre)</h1>
                 <p class="text-sm text-brand/50 mt-1">Showing @Model.Count result@(Model.Count != 1 ? "s" : "")</p>
             </div>
-            <form method="get" action="/Store" class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <div class="relative min-w-[200px]">
-                    <select name="genre" class="w-full bg-navy-deep border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none transition focus:border-accent appearance-none cursor-pointer" onchange="this.form.submit()">
-                        <option value="All" class="bg-navy-deep text-white" selected="@(selectedGenre == "All")">All Categories</option>
+                    <select name="genreSelect" class="w-full bg-navy-deep border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none transition focus:border-accent appearance-none cursor-pointer" onchange="filterByGenre(this.value)">
+                        <option value="All" selected="@(selectedGenre == "All")">All Categories</option>
                         <optgroup label="Main Categories" class="bg-navy text-accent font-bold">
-                            <option value="Games" class="bg-navy-deep text-brand" selected="@(selectedGenre == "Games")">Digital Games</option>
-                            <option value="Hardware" class="bg-navy-deep text-brand" selected="@(selectedGenre == "Hardware")">Hardware & Parts</option>
+                            <option value="Games" selected="@(selectedGenre == "Games")">Digital Games</option>
+                            <option value="Hardware" selected="@(selectedGenre == "Hardware")">Hardware & Parts</option>
                         </optgroup>
                         <optgroup label="Game Genres" class="bg-navy text-accent font-bold">
                             @foreach (var g in games.Select(x => x.Genre).Distinct().OrderBy(x => x))
                             {
-                                <option value="@g" class="bg-navy-deep text-brand" selected="@(selectedGenre == g)">@g</option>
+                                <option value="@g" selected="@(selectedGenre == g)">@g</option>
                             }
                         </optgroup>
                         <optgroup label="Hardware Types" class="bg-navy text-accent font-bold">
                             @foreach (var g in hardware.Select(x => x.Genre).Distinct().OrderBy(x => x))
                             {
-                                <option value="@g" class="bg-navy-deep text-brand" selected="@(selectedGenre == g)">@g</option>
+                                <option value="@g" selected="@(selectedGenre == g)">@g</option>
                             }
                         </optgroup>
                     </select>
@@ -103,7 +191,7 @@
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 fill-brand/40" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 </div>
                 <button type="submit" class="bg-accent/20 border border-accent/30 text-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-accent hover:text-navy-deep transition">Search</button>
-            </form>
+            </div>
         </div>
 
         <!-- Games Grid -->
@@ -137,16 +225,74 @@
                             </div>
                             <h3 class="text-sm font-semibold text-white line-clamp-2">@game.Title</h3>
                             <span class="text-sm font-bold text-white mt-auto pt-2">$@game.Price.ToString("F2")</span>
-                            <form method="post" action="/Cart/AddToCart" class="mt-2">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="gameId" value="@game.Id" />
-                                <input type="hidden" name="returnUrl" value="/Store?genre=@selectedGenre&search=@search" />
-                                <button type="submit" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-2 rounded-lg hover:bg-accent hover:text-navy-deep transition">Add to Cart</button>
-                            </form>
+                            <button type="submit" asp-controller="Cart" asp-action="AddToCart" name="gameId" value="@game.Id" class="w-full bg-accent/10 border border-accent/30 text-accent text-xs font-semibold py-2 rounded-lg hover:bg-accent hover:text-navy-deep transition mt-2">
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
                 }
             </div>
         }
     </div>
-</div>
+</form>
+
+<script>
+    function filterByGenre(genre) {
+        document.getElementById('filter-genre').value = genre;
+        document.getElementById('filter-form').submit();
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('store-sidebar');
+        sidebar.classList.toggle('collapsed');
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem('store-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+    }
+
+    function toggleSection(id) {
+        // Expand sidebar if currently collapsed
+        const sidebar = document.getElementById('store-sidebar');
+        if (sidebar.classList.contains('collapsed')) {
+            sidebar.classList.remove('collapsed');
+            localStorage.setItem('store-sidebar-collapsed', 'false');
+        }
+
+        const nav = document.getElementById(id);
+        const arrow = document.getElementById('arrow-' + id);
+        if (!nav || !arrow) return;
+        
+        nav.classList.toggle('section-collapsed');
+        const isCollapsed = nav.classList.contains('section-collapsed');
+        
+        if (isCollapsed) {
+            arrow.classList.remove('rotate-180');
+            localStorage.setItem('section-expanded-' + id, 'false');
+        } else {
+            arrow.classList.add('rotate-180');
+            localStorage.setItem('section-expanded-' + id, 'true');
+        }
+    }
+
+    // Restore state from local storage on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('store-sidebar-collapsed') === 'true') {
+            document.getElementById('store-sidebar').classList.add('collapsed');
+        }
+
+        const sections = ['section-browse', 'section-games', 'section-hardware', 'section-filters'];
+        sections.forEach(id => {
+            const nav = document.getElementById(id);
+            const arrow = document.getElementById('arrow-' + id);
+            if (!nav || !arrow) return;
+
+            const state = localStorage.getItem('section-expanded-' + id);
+            if (state === 'false') {
+                nav.classList.add('section-collapsed');
+                arrow.classList.remove('rotate-180');
+            } else {
+                nav.classList.remove('section-collapsed');
+                arrow.classList.add('rotate-180');
+            }
+        });
+    });
+</script>

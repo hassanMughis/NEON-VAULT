@@ -1,13 +1,29 @@
+@model Neon_vault.Models.Complaint
 @{
     ViewData["Title"] = "Contact Us";
 }
 
-<div class="px-6 py-12 max-w-2xl mx-auto">
-    <div class="mb-8">
+<div class="px-6 py-12 max-w-2xl mx-auto space-y-8">
+    <div>
         <h1 class="font-sora text-2xl font-extrabold text-white mb-2">Contact Support</h1>
         <p class="text-brand/60 text-sm">Reach out for any inquiries regarding products, orders, or technical support.</p>
     </div>
 
+    @if (TempData["Message"] != null)
+    {
+        <div class="rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">
+            @TempData["Message"]
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            @Html.ValidationSummary(false, "", new { @class = "text-sm list-none" })
+        </div>
+    }
+
+    <!-- Contact Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-navy-deep border border-slate-800/50 rounded-xl p-5 flex items-start gap-4">
             <div class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-accent shrink-0">
@@ -30,5 +46,32 @@
                 <a href="mailto:support@neonvault.com" class="text-accent font-sora text-base font-bold hover:text-accent-dark transition break-all">support@neonvault.com</a>
             </div>
         </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="bg-navy-deep border border-slate-800/50 rounded-xl p-6">
+        <h2 class="font-sora text-lg font-bold text-white mb-4">Send a Complaint or Feedback</h2>
+        <form method="post" action="/Home/Contact" class="space-y-4">
+            @Html.AntiForgeryToken()
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Name</label>
+                    <input asp-for="Name" required class="w-full bg-navy border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition" placeholder="Your name" />
+                </div>
+                <div>
+                    <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Email</label>
+                    <input asp-for="Email" type="email" required class="w-full bg-navy border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition" placeholder="Your email address" />
+                </div>
+            </div>
+            <div>
+                <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Subject</label>
+                <input asp-for="Subject" required class="w-full bg-navy border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition" placeholder="What is this regarding?" />
+            </div>
+            <div>
+                <label class="text-xs text-brand/40 uppercase tracking-wider block mb-1.5">Message / Complaint</label>
+                <textarea asp-for="Message" rows="5" required class="w-full bg-navy border border-slate-800/50 rounded-lg py-2.5 px-4 text-white text-sm outline-none focus:border-accent transition resize-none" placeholder="Describe your issue or feedback in detail..."></textarea>
+            </div>
+            <button type="submit" class="w-full bg-accent text-navy-deep font-bold text-sm py-3 rounded-lg hover:bg-accent-dark hover:text-white transition-all shadow-[0_0_15px_rgba(221,183,255,0.2)]">Submit Message</button>
+        </form>
     </div>
 </div>

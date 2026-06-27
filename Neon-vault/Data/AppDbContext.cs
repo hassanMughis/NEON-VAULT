@@ -19,6 +19,7 @@ namespace Neon_vault.Data
         public DbSet<ChatUser> ChatUsers => Set<ChatUser>();
         public DbSet<Channel> Channels => Set<Channel>();
         public DbSet<Message> Messages => Set<Message>();
+        public DbSet<Complaint> Complaints => Set<Complaint>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,7 +49,8 @@ namespace Neon_vault.Data
                     Genre = "RPG",
                     ReleaseDate = new DateTime(2025, 11, 15),
                     Developer = "NeonForge Studios",
-                    CoverImageUrl = "/images/game_card_1.png"
+                    CoverImageUrl = "/images/game_card_1.png",
+                    AdditionalImageUrls = "/images/game_card_2.png,/images/game_card_3.png,/images/game_card_4.png"
                 },
                 new Game
                 {
@@ -59,7 +61,8 @@ namespace Neon_vault.Data
                     Genre = "FPS",
                     ReleaseDate = new DateTime(2026, 1, 22),
                     Developer = "Void Interactive",
-                    CoverImageUrl = "/images/game_card_2.png"
+                    CoverImageUrl = "/images/game_card_2.png",
+                    AdditionalImageUrls = "/images/game_card_3.png,/images/game_card_4.png,/images/game_card_5.png"
                 },
                 new Game
                 {
@@ -70,7 +73,8 @@ namespace Neon_vault.Data
                     Genre = "Adventure",
                     ReleaseDate = new DateTime(2026, 3, 10),
                     Developer = "Rift Games",
-                    CoverImageUrl = "/images/game_card_3.png"
+                    CoverImageUrl = "/images/game_card_3.png",
+                    AdditionalImageUrls = "/images/game_card_4.png,/images/game_card_5.png,/images/game_card_6.png"
                 },
                 new Game
                 {
@@ -81,7 +85,8 @@ namespace Neon_vault.Data
                     Genre = "Stealth",
                     ReleaseDate = new DateTime(2025, 8, 5),
                     Developer = "Shadow Works",
-                    CoverImageUrl = "/images/game_card_4.png"
+                    CoverImageUrl = "/images/game_card_4.png",
+                    AdditionalImageUrls = "/images/game_card_5.png,/images/game_card_6.png,/images/game_card_7.png"
                 },
                 new Game
                 {
@@ -92,7 +97,8 @@ namespace Neon_vault.Data
                     Genre = "Action RPG",
                     ReleaseDate = new DateTime(2025, 6, 18),
                     Developer = "Abyss Studios",
-                    CoverImageUrl = "/images/game_card_5.png"
+                    CoverImageUrl = "/images/game_card_5.png",
+                    AdditionalImageUrls = "/images/game_card_6.png,/images/game_card_7.png,/images/game_card_8.png"
                 },
                 new Game
                 {
@@ -103,7 +109,8 @@ namespace Neon_vault.Data
                     Genre = "Racing",
                     ReleaseDate = new DateTime(2026, 2, 14),
                     Developer = "Speed Studios",
-                    CoverImageUrl = "/images/game_card_6.png"
+                    CoverImageUrl = "/images/game_card_6.png",
+                    AdditionalImageUrls = "/images/game_card_7.png,/images/game_card_8.png,/images/game_card_1.png"
                 },
                 new Game
                 {
@@ -114,7 +121,8 @@ namespace Neon_vault.Data
                     Genre = "Exploration",
                     ReleaseDate = new DateTime(2025, 12, 1),
                     Developer = "Cosmos Labs",
-                    CoverImageUrl = "/images/game_card_7.png"
+                    CoverImageUrl = "/images/game_card_7.png",
+                    AdditionalImageUrls = "/images/game_card_8.png,/images/game_card_1.png,/images/game_card_2.png"
                 },
                 new Game
                 {
@@ -125,7 +133,8 @@ namespace Neon_vault.Data
                     Genre = "Sci-Fi",
                     ReleaseDate = new DateTime(2026, 5, 30),
                     Developer = "Protocol Games",
-                    CoverImageUrl = "/images/game_card_8.png"
+                    CoverImageUrl = "/images/game_card_8.png",
+                    AdditionalImageUrls = "/images/game_card_1.png,/images/game_card_2.png,/images/game_card_3.png"
                 },
                 new Game
                 {
@@ -137,7 +146,8 @@ namespace Neon_vault.Data
                     Category = "Hardware",
                     ReleaseDate = new DateTime(2025, 11, 15),
                     Developer = "NeonForge Hardware",
-                    CoverImageUrl = "/images/hardware_1.png"
+                    CoverImageUrl = "/images/hardware_1.png",
+                    AdditionalImageUrls = "/images/hardware_2.png,/images/hardware_3.png,/images/hardware_4.png"
                 },
                 new Game
                 {
@@ -149,7 +159,8 @@ namespace Neon_vault.Data
                     Category = "Hardware",
                     ReleaseDate = new DateTime(2026, 1, 10),
                     Developer = "Void Interactive Gear",
-                    CoverImageUrl = "/images/hardware_2.png"
+                    CoverImageUrl = "/images/hardware_2.png",
+                    AdditionalImageUrls = "/images/hardware_3.png,/images/hardware_4.png,/images/hardware_1.png"
                 },
                 new Game
                 {
@@ -161,7 +172,8 @@ namespace Neon_vault.Data
                     Category = "Hardware",
                     ReleaseDate = new DateTime(2026, 3, 5),
                     Developer = "NeonForge Hardware",
-                    CoverImageUrl = "/images/hardware_3.png"
+                    CoverImageUrl = "/images/hardware_3.png",
+                    AdditionalImageUrls = "/images/hardware_4.png,/images/hardware_1.png,/images/hardware_2.png"
                 },
                 new Game
                 {
@@ -169,11 +181,64 @@ namespace Neon_vault.Data
                     Title = "Neon RTX 6090 GPU",
                     Description = "The most powerful graphics card in the world. Dominate the cyberpunk landscape with true path tracing.",
                     Price = 1599.99m,
-                    Genre = "Component",
+                    Genre = "GPU",
                     Category = "Hardware",
                     ReleaseDate = new DateTime(2025, 12, 20),
                     Developer = "NeonForge Hardware",
-                    CoverImageUrl = "/images/hardware_4.png"
+                    CoverImageUrl = "/images/hardware_4.png",
+                    AdditionalImageUrls = "/images/hardware_1.png,/images/hardware_2.png,/images/hardware_3.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567805"),
+                    Title = "Viper Neon DDR5 RAM 32GB",
+                    Description = "Supercharged DDR5 gaming RAM with premium heatsink and RGB lighting.",
+                    Price = 129.99m,
+                    Genre = "RAM",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2026, 2, 10),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_1.png",
+                    AdditionalImageUrls = "/images/hardware_2.png,/images/hardware_3.png,/images/hardware_4.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567806"),
+                    Title = "ROG Matrix Z890 Motherboard",
+                    Description = "High-end motherboard featuring advanced cooling, PCIe 5.0, and dynamic lighting.",
+                    Price = 389.99m,
+                    Genre = "Motherboard",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2026, 4, 15),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_2.png",
+                    AdditionalImageUrls = "/images/hardware_3.png,/images/hardware_4.png,/images/hardware_1.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567807"),
+                    Title = "Apex Quantum 2TB NVMe SSD",
+                    Description = "Blazing fast NVMe SSD with speeds up to 7400MB/s for instant load times.",
+                    Price = 189.99m,
+                    Genre = "SSD",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2026, 5, 20),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_3.png",
+                    AdditionalImageUrls = "/images/hardware_4.png,/images/hardware_1.png,/images/hardware_2.png"
+                },
+                new Game
+                {
+                    Id = Guid.Parse("b1b2c3d4-e5f6-7890-abcd-ef1234567808"),
+                    Title = "Intel Core Ultra 9 Processor",
+                    Description = "Next-gen multi-core processor for superior gaming performance and multitasking.",
+                    Price = 549.99m,
+                    Genre = "CPU",
+                    Category = "Hardware",
+                    ReleaseDate = new DateTime(2026, 1, 30),
+                    Developer = "NeonForge Hardware",
+                    CoverImageUrl = "/images/hardware_4.png",
+                    AdditionalImageUrls = "/images/hardware_1.png,/images/hardware_2.png,/images/hardware_3.png"
                 }
             );
         }

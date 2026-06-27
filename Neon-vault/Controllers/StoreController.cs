@@ -17,7 +17,7 @@ namespace Neon_vault.Controllers
         }
 
         /// <summary>Store catalog page with search and category filtering.</summary>
-        public async Task<IActionResult> Index(string? search, string? genre)
+        public async Task<IActionResult> Index(string? search, string? genre, string? sortBy, decimal? minPrice, decimal? maxPrice)
         {
             var query = _db.Games.AsQueryable();
 
@@ -37,7 +37,33 @@ namespace Neon_vault.Controllers
                 }
             }
 
-            var games = await query.OrderBy(g => g.Title).ToListAsync();
+            if (minPrice.HasValue)
+            {
+                query = query.Where(g => g.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(g => g.Price <= maxPrice.Value);
+            }
+
+            switch (sortBy)
+            {
+                case "price_asc":
+                    query = query.OrderBy(g => g.Price);
+                    break;
+                case "price_desc":
+                    query = query.OrderByDescending(g => g.Price);
+                    break;
+                case "newest":
+                    query = query.OrderByDescending(g => g.ReleaseDate);
+                    break;
+                default:
+                    query = query.OrderBy(g => g.Title);
+                    break;
+            }
+
+            var games = await query.ToListAsync();
             
             // To build the sidebar we need all games
             var allGames = await _db.Games.ToListAsync();
@@ -45,6 +71,9 @@ namespace Neon_vault.Controllers
 
             ViewBag.Search = search;
             ViewBag.SelectedGenre = genre ?? "All";
+            ViewBag.SortBy = sortBy ?? "default";
+            ViewBag.MinPrice = minPrice;
+            ViewBag.MaxPrice = maxPrice;
 
             return View(games);
         }

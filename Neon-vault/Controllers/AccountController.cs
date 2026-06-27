@@ -124,7 +124,9 @@ namespace Neon_vault.Controllers
             }
 
             var sessionId = GetSessionId();
-            var guestUser = await _db.ChatUsers.FirstOrDefaultAsync(u => u.SessionId == sessionId && u.IsTemporaryGuest);
+            var guestUser = HttpContext.Session.GetString("IsAdmin") == "true"
+                ? null
+                : await _db.ChatUsers.FirstOrDefaultAsync(u => u.SessionId == sessionId && u.IsTemporaryGuest);
             ChatUser user;
 
             if (guestUser != null)
@@ -158,6 +160,12 @@ namespace Neon_vault.Controllers
             }
 
             await _db.SaveChangesAsync();
+
+            if (HttpContext.Session.GetString("IsAdmin") == "true")
+            {
+                TempData["Message"] = "Account created successfully.";
+                return RedirectToAction("Users", "Admin");
+            }
 
             HttpContext.Session.SetString("CurrentUserId", user.Id.ToString());
             HttpContext.Session.SetString("CurrentUserName", string.IsNullOrWhiteSpace(user.DisplayName) ? user.Username : user.DisplayName);

@@ -9,6 +9,9 @@
 <style>
     .tag-chip { transition: all 0.2s; }
     .tag-chip:hover { background: rgba(221, 183, 255, 0.12); border-color: rgba(221, 183, 255, 0.3); color: #DDB7FF; }
+    .thumbnail-btn { transition: all 0.2s; opacity: 0.6; }
+    .thumbnail-btn:hover { opacity: 1; border-color: rgba(221, 183, 255, 0.5); }
+    .thumbnail-btn.active { opacity: 1; border-color: #DDB7FF; box-shadow: 0 0 10px rgba(221, 183, 255, 0.4); }
 </style>
 }
 
@@ -25,9 +28,30 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column: Media & Description -->
         <div class="lg:col-span-2">
-            <div class="rounded-2xl overflow-hidden h-[400px] bg-navy-deep border border-slate-800/50">
-                <img src="@Model.CoverImageUrl" alt="@Model.Title" class="w-full h-full object-cover" />
+            <div class="rounded-2xl overflow-hidden h-[400px] bg-navy-deep border border-slate-800/50 relative">
+                <img id="main-product-image" src="@Model.CoverImageUrl" alt="@Model.Title" class="w-full h-full object-cover transition-all duration-300" />
             </div>
+
+            <!-- Image Gallery Thumbnails -->
+            @{
+                var additionalUrls = !string.IsNullOrWhiteSpace(Model.AdditionalImageUrls)
+                    ? Model.AdditionalImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                    : new List<string>();
+                var allImages = new List<string> { Model.CoverImageUrl };
+                allImages.AddRange(additionalUrls);
+            }
+            @if (allImages.Count > 1)
+            {
+                <div class="flex gap-3 mt-4 overflow-x-auto pb-2">
+                    @for (int i = 0; i < allImages.Count; i++)
+                    {
+                        var imgUrl = allImages[i];
+                        <button type="button" onclick="setMainImage('@imgUrl', this)" class="thumbnail-btn w-20 h-20 rounded-xl overflow-hidden border @(i == 0 ? "active border-accent" : "border-slate-800") bg-navy-deep shrink-0 focus:outline-none">
+                            <img src="@imgUrl" class="w-full h-full object-cover" />
+                        </button>
+                    }
+                </div>
+            }
 
             <div class="mt-8">
                 <h2 class="font-outfit text-lg font-bold text-white mb-4">About This Game</h2>
@@ -96,3 +120,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    function setMainImage(url, btn) {
+        document.getElementById('main-product-image').src = url;
+        document.querySelectorAll('.thumbnail-btn').forEach(b => {
+            b.classList.remove('active', 'border-accent');
+            b.classList.add('border-slate-800');
+        });
+        if (btn) {
+            btn.classList.add('active', 'border-accent');
+            btn.classList.remove('border-slate-800');
+        }
+    }
+</script>

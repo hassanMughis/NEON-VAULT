@@ -169,7 +169,7 @@ namespace Neon_vault.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateGame(Game game, IFormFile? CoverImage)
+        public async Task<IActionResult> CreateGame(Game game, IFormFile? CoverImage, List<IFormFile>? AdditionalImages)
         {
             if (!IsAdmin()) return RedirectToAction("Login");
 
@@ -199,6 +199,28 @@ namespace Neon_vault.Controllers
                     game.CoverImageUrl = "/images/game_card_1.png"; // fallback
                 }
 
+                // Handle additional images
+                if (AdditionalImages != null && AdditionalImages.Any())
+                {
+                    var savedUrls = new List<string>();
+                    var imagesDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                    Directory.CreateDirectory(imagesDir);
+                    foreach (var image in AdditionalImages)
+                    {
+                        if (image.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                            var filePath = Path.Combine(imagesDir, fileName);
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(stream);
+                            }
+                            savedUrls.Add("/images/" + fileName);
+                        }
+                    }
+                    game.AdditionalImageUrls = string.Join(",", savedUrls);
+                }
+
                 _db.Games.Add(game);
                 await _db.SaveChangesAsync();
                 TempData["Message"] = $"Product '{game.Title}' created!";
@@ -220,7 +242,7 @@ namespace Neon_vault.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditGame(Game game, IFormFile? CoverImage)
+        public async Task<IActionResult> EditGame(Game game, IFormFile? CoverImage, List<IFormFile>? AdditionalImages)
         {
             if (!IsAdmin()) return RedirectToAction("Login");
 
@@ -241,6 +263,28 @@ namespace Neon_vault.Controllers
                     }
 
                     game.CoverImageUrl = "/images/" + fileName;
+                }
+
+                // Handle additional images
+                if (AdditionalImages != null && AdditionalImages.Any())
+                {
+                    var savedUrls = new List<string>();
+                    var imagesDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                    Directory.CreateDirectory(imagesDir);
+                    foreach (var image in AdditionalImages)
+                    {
+                        if (image.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                            var filePath = Path.Combine(imagesDir, fileName);
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(stream);
+                            }
+                            savedUrls.Add("/images/" + fileName);
+                        }
+                    }
+                    game.AdditionalImageUrls = string.Join(",", savedUrls);
                 }
 
                 _db.Games.Update(game);
@@ -267,6 +311,13 @@ namespace Neon_vault.Controllers
             }
 
             return RedirectToAction("Games");
+        }
+
+        public async Task<IActionResult> Complaints()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login");
+            var complaints = await _db.Complaints.OrderByDescending(c => c.SubmittedAt).ToListAsync();
+            return View(complaints);
         }
 
         // ── Helper ──────────────────────────────────────────────────

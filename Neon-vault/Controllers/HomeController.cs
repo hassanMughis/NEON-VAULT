@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neon_vault.Data;
+using Neon_vault.Models;
 
 namespace Neon_vault.Controllers
 {
@@ -19,9 +20,26 @@ namespace Neon_vault.Controllers
             return View(games);
         }
 
+        [HttpGet]
         public IActionResult Contact()
         {
-            return View();
+            return View(new Complaint());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Contact(Complaint model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Id = Guid.NewGuid();
+                model.SubmittedAt = DateTime.UtcNow;
+                _db.Complaints.Add(model);
+                await _db.SaveChangesAsync();
+                TempData["Message"] = "Thank you! Your message has been successfully sent to the admin.";
+                return RedirectToAction("Contact");
+            }
+            return View(model);
         }
     }
 }

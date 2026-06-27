@@ -43,7 +43,14 @@
                 <textarea asp-for="Bio" rows="4" class="w-full rounded-xl border border-slate-800/50 bg-navy px-4 py-3 text-sm text-white outline-none focus:border-accent" placeholder="Tell people what you play..."></textarea>
             </div>
             <div class="flex items-center justify-between">
-                <a href="/Community" class="text-sm text-brand/50 hover:text-accent">Skip for now</a>
+                @if (Context.Session.GetString("IsAdmin") == "true")
+                {
+                    <a href="/Admin/Users" class="text-sm text-brand/50 hover:text-accent">Cancel</a>
+                }
+                else
+                {
+                    <a href="/Community" class="text-sm text-brand/50 hover:text-accent">Skip for now</a>
+                }
                 <button type="submit" class="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-navy-deep transition hover:bg-accent-dark">Create Account</button>
             </div>
         </form>

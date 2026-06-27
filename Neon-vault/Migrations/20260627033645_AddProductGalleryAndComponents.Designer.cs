@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neon_vault.Data;
 
@@ -11,9 +12,11 @@ using Neon_vault.Data;
 namespace Neon_vault.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260627033645_AddProductGalleryAndComponents")]
+    partial class AddProductGalleryAndComponents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,40 +125,6 @@ namespace Neon_vault.Migrations
                     b.ToTable("ChatUsers");
                 });
 
-            modelBuilder.Entity("Neon_vault.Models.Complaint", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Complaints");
-                });
-
             modelBuilder.Entity("Neon_vault.Models.Game", b =>
                 {
                     b.Property<Guid>("Id")
@@ -211,7 +180,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567801"),
-                            AdditionalImageUrls = "/images/game_card_2.png,/images/game_card_3.png,/images/game_card_4.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_1.png",
                             Description = "Dive into a sprawling cyberpunk metropolis as a rogue hacker with mysterious powers. Uncover corporate conspiracies, upgrade your neural implants, and shape the fate of Neo Shanghai in this award-winning open-world RPG.",
@@ -224,7 +193,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567802"),
-                            AdditionalImageUrls = "/images/game_card_3.png,/images/game_card_4.png,/images/game_card_5.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_2.png",
                             Description = "Fast-paced multiplayer FPS set on abandoned space stations. Team up with friends or go solo in intense 60-player battles across zero-gravity arenas. Features advanced movement mechanics and destructible environments.",
@@ -237,7 +206,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567803"),
-                            AdditionalImageUrls = "/images/game_card_4.png,/images/game_card_5.png,/images/game_card_6.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_3.png",
                             Description = "A breathtaking fantasy adventure through shattered realms where magic and technology collide. Master elemental powers, solve ancient puzzles, and battle mythical creatures in a world teetering on the edge of destruction.",
@@ -250,7 +219,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567804"),
-                            AdditionalImageUrls = "/images/game_card_5.png,/images/game_card_6.png,/images/game_card_7.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_4.png",
                             Description = "Lead an elite black-ops unit through 20 covert missions across the globe. Plan your approach, utilize stealth or go loud, and manage your squad's unique abilities in this tactical stealth-action thriller.",
@@ -263,7 +232,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567805"),
-                            AdditionalImageUrls = "/images/game_card_6.png,/images/game_card_7.png,/images/game_card_8.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_5.png",
                             Description = "Descend into procedurally generated dungeons filled with relentless enemies and legendary loot. This hardcore action-RPG challenges you to master tight combat mechanics and build unstoppable character synergies.",
@@ -276,7 +245,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567806"),
-                            AdditionalImageUrls = "/images/game_card_7.png,/images/game_card_8.png,/images/game_card_1.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_6.png",
                             Description = "Hit the neon-lit streets in the ultimate arcade racing experience. Customize 50+ licensed vehicles, drift through iconic city circuits, and compete in online championships with players worldwide.",
@@ -289,7 +258,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567807"),
-                            AdditionalImageUrls = "/images/game_card_8.png,/images/game_card_1.png,/images/game_card_2.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_7.png",
                             Description = "Chart your course through an infinite procedurally generated galaxy. Mine asteroids, trade exotic goods, build space stations, and discover alien civilizations in this relaxing yet deep space exploration simulator.",
@@ -302,7 +271,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567808"),
-                            AdditionalImageUrls = "/images/game_card_1.png,/images/game_card_2.png,/images/game_card_3.png",
+                            AdditionalImageUrls = "",
                             Category = "Game",
                             CoverImageUrl = "/images/game_card_8.png",
                             Description = "Humanity's first contact with alien intelligence has gone wrong. As a military scientist, use experimental portal technology to hop between dimensions, solve reality-bending puzzles, and prevent a multiverse collapse.",
@@ -315,7 +284,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567801"),
-                            AdditionalImageUrls = "/images/hardware_2.png,/images/hardware_3.png,/images/hardware_4.png",
+                            AdditionalImageUrls = "",
                             Category = "Hardware",
                             CoverImageUrl = "/images/hardware_1.png",
                             Description = "The ultimate next-gen experience. 4K 120FPS with a 1TB SSD. Discover premium consoles and maximum immersion.",
@@ -328,7 +297,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567802"),
-                            AdditionalImageUrls = "/images/hardware_3.png,/images/hardware_4.png,/images/hardware_1.png",
+                            AdditionalImageUrls = "",
                             Category = "Hardware",
                             CoverImageUrl = "/images/hardware_2.png",
                             Description = "Pro headset paired with competitive layout controller. 7.1 Surround Sound and Wireless connectivity.",
@@ -341,7 +310,7 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567803"),
-                            AdditionalImageUrls = "/images/hardware_4.png,/images/hardware_1.png,/images/hardware_2.png",
+                            AdditionalImageUrls = "",
                             Category = "Hardware",
                             CoverImageUrl = "/images/hardware_3.png",
                             Description = "Ultra-responsive controller with customizable paddles, trigger stops, and haptic feedback.",
@@ -354,67 +323,15 @@ namespace Neon_vault.Migrations
                         new
                         {
                             Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567804"),
-                            AdditionalImageUrls = "/images/hardware_1.png,/images/hardware_2.png,/images/hardware_3.png",
+                            AdditionalImageUrls = "",
                             Category = "Hardware",
                             CoverImageUrl = "/images/hardware_4.png",
                             Description = "The most powerful graphics card in the world. Dominate the cyberpunk landscape with true path tracing.",
                             Developer = "NeonForge Hardware",
-                            Genre = "GPU",
+                            Genre = "Component",
                             Price = 1599.99m,
                             ReleaseDate = new DateTime(2025, 12, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "Neon RTX 6090 GPU"
-                        },
-                        new
-                        {
-                            Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567805"),
-                            AdditionalImageUrls = "/images/hardware_2.png,/images/hardware_3.png,/images/hardware_4.png",
-                            Category = "Hardware",
-                            CoverImageUrl = "/images/hardware_1.png",
-                            Description = "Supercharged DDR5 gaming RAM with premium heatsink and RGB lighting.",
-                            Developer = "NeonForge Hardware",
-                            Genre = "RAM",
-                            Price = 129.99m,
-                            ReleaseDate = new DateTime(2026, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Viper Neon DDR5 RAM 32GB"
-                        },
-                        new
-                        {
-                            Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567806"),
-                            AdditionalImageUrls = "/images/hardware_3.png,/images/hardware_4.png,/images/hardware_1.png",
-                            Category = "Hardware",
-                            CoverImageUrl = "/images/hardware_2.png",
-                            Description = "High-end motherboard featuring advanced cooling, PCIe 5.0, and dynamic lighting.",
-                            Developer = "NeonForge Hardware",
-                            Genre = "Motherboard",
-                            Price = 389.99m,
-                            ReleaseDate = new DateTime(2026, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "ROG Matrix Z890 Motherboard"
-                        },
-                        new
-                        {
-                            Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567807"),
-                            AdditionalImageUrls = "/images/hardware_4.png,/images/hardware_1.png,/images/hardware_2.png",
-                            Category = "Hardware",
-                            CoverImageUrl = "/images/hardware_3.png",
-                            Description = "Blazing fast NVMe SSD with speeds up to 7400MB/s for instant load times.",
-                            Developer = "NeonForge Hardware",
-                            Genre = "SSD",
-                            Price = 189.99m,
-                            ReleaseDate = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Apex Quantum 2TB NVMe SSD"
-                        },
-                        new
-                        {
-                            Id = new Guid("b1b2c3d4-e5f6-7890-abcd-ef1234567808"),
-                            AdditionalImageUrls = "/images/hardware_1.png,/images/hardware_2.png,/images/hardware_3.png",
-                            Category = "Hardware",
-                            CoverImageUrl = "/images/hardware_4.png",
-                            Description = "Next-gen multi-core processor for superior gaming performance and multitasking.",
-                            Developer = "NeonForge Hardware",
-                            Genre = "CPU",
-                            Price = 549.99m,
-                            ReleaseDate = new DateTime(2026, 1, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Intel Core Ultra 9 Processor"
                         });
                 });
 
