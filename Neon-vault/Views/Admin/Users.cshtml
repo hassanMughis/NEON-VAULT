@@ -4,46 +4,97 @@
     ViewData["Title"] = "Manage Users";
 }
 
+@section Styles {
+<style>
+    .table-row:hover { background: rgba(221,183,255,0.025); }
+    .table-row { transition: background 0.12s; }
+</style>
+}
+
 <div class="flex min-h-screen">
     @await Html.PartialAsync("_AdminSidebar", "Users")
 
-    <div class="flex-1 overflow-y-auto">
-        <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-navy/50 sticky top-0 z-50">
-            <h1 class="font-outfit text-lg font-bold text-white">Users</h1>
-            <a href="/Account/Register" class="text-xs text-accent hover:underline">Create New User →</a>
+    <div class="flex-1 overflow-y-auto bg-[#07101F]">
+        <!-- Header -->
+        <header class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-navy-deep/80 backdrop-blur sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-1 h-5 rounded-full bg-accent shadow-[0_0_8px_rgba(221,183,255,0.7)]"></div>
+                <h1 class="font-sora text-base font-bold text-white">Users</h1>
+                <span class="text-xs font-bold text-accent bg-accent/10 border border-accent/20 px-2.5 py-0.5 rounded-full">@Model.Count</span>
+            </div>
+            <a href="/Account/Register" class="inline-flex items-center gap-2 bg-accent text-navy-deep font-bold text-xs px-4 py-2 rounded-xl hover:bg-accent-dark hover:text-white transition-all duration-150 shadow-[0_0_16px_rgba(221,183,255,0.2)]">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Create User
+            </a>
         </header>
 
-        <div class="p-6">
+        <div class="p-8">
             @if (TempData["Message"] != null)
             {
-                <div class="mb-4 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">@TempData["Message"]</div>
+                <div class="flex items-center gap-3 mb-6 bg-accent/10 border border-accent/25 text-accent text-sm px-5 py-3 rounded-xl">
+                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    @TempData["Message"]
+                </div>
             }
 
-            <div class="overflow-x-auto rounded-xl border border-slate-800/50 bg-navy">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-800/50 bg-white/[0.02]">
-                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">User</th>
-                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">Email</th>
-                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">Role</th>
-                            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-wider text-brand/40">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var user in Model)
-                        {
-                            <tr class="border-b border-slate-800/20 hover:bg-white/[0.02]">
-                                <td class="px-4 py-3 text-white">
-                                    <div class="font-semibold">@user.Username</div>
-                                    <div class="text-xs text-brand/40">@user.DisplayName</div>
-                                </td>
-                                <td class="px-4 py-3 text-brand/60">@user.Email</td>
-                                <td class="px-4 py-3 text-brand/60">@(user.IsAdmin ? "Admin" : "Member")</td>
-                                <td class="px-4 py-3 text-brand/60">@(user.IsActive ? "Active" : "Disabled")</td>
+            <div class="bg-navy border border-white/5 rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-white/5 bg-white/[0.015]">
+                                <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3.5 px-6">User</th>
+                                <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3.5 px-4">Email</th>
+                                <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3.5 px-4">Role</th>
+                                <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3.5 px-4">Status</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                <tr class="table-row border-b border-white/[0.04] last:border-0">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-xl bg-accent/15 border border-accent/20 flex items-center justify-center shrink-0">
+                                                <span class="text-xs font-extrabold text-accent">@user.Username.Substring(0, 1).ToUpperInvariant()</span>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm text-white font-semibold">@user.Username</div>
+                                                <div class="text-xs text-brand/40">@user.DisplayName</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 text-xs text-brand/50 font-mono">@user.Email</td>
+                                    <td class="py-4 px-4">
+                                        @if (user.IsAdmin)
+                                        {
+                                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-accent/10 text-accent border border-accent/20 uppercase tracking-wide">Admin</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/5 text-brand/50 border border-white/10 uppercase tracking-wide">Member</span>
+                                        }
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-green-400/10 text-green-400 border border-green-400/20 uppercase tracking-wide">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                                                Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-400/10 text-red-400 border border-red-400/20 uppercase tracking-wide">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                                Disabled
+                                            </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

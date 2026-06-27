@@ -1,0 +1,90 @@
+@model List<Neon_vault.Models.ContactMessage>
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Contact Messages"; }
+
+@section Styles {
+<style>
+    .table-row:hover { background: rgba(221,183,255,0.025); }
+    .table-row { transition: background 0.12s; }
+</style>
+}
+
+<div class="flex min-h-screen">
+    @await Html.PartialAsync("_AdminSidebar", "Messages")
+    <div class="flex-1 overflow-y-auto bg-[#07101F]">
+        <!-- Header -->
+        <header class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-navy-deep/80 backdrop-blur sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-1 h-5 rounded-full bg-accent shadow-[0_0_8px_rgba(221,183,255,0.7)]"></div>
+                <h1 class="font-sora text-base font-bold text-white">Messages</h1>
+                <span class="text-xs font-bold text-accent bg-accent/10 border border-accent/20 px-2.5 py-0.5 rounded-full">@Model.Count</span>
+                @{var unread = Model.Count(m => !m.IsRead);}
+                @if (unread > 0)
+                {
+                    <span class="text-xs font-bold text-orange-400 bg-orange-400/10 border border-orange-400/20 px-2.5 py-0.5 rounded-full">@unread unread</span>
+                }
+            </div>
+        </header>
+
+        <div class="p-8">
+            @if (!Model.Any())
+            {
+                <div class="flex flex-col items-center justify-center py-24 gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center">
+                        <svg class="w-8 h-8 fill-brand/20" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    </div>
+                    <p class="text-sm text-brand/30 font-semibold">No messages yet.</p>
+                    <p class="text-xs text-brand/20">Messages submitted via the Contact page will appear here.</p>
+                </div>
+            }
+            else
+            {
+                <div class="space-y-3">
+                    @foreach (var msg in Model)
+                    {
+                        <div class="bg-navy border @(msg.IsRead ? "border-white/5" : "border-accent/20") rounded-2xl overflow-hidden @(msg.IsRead ? "" : "shadow-[0_0_20px_rgba(221,183,255,0.05)]")">
+                            <!-- Message Header -->
+                            <div class="flex items-center gap-4 px-6 py-4 border-b border-white/5">
+                                <div class="w-9 h-9 rounded-xl @(msg.IsRead ? "bg-white/5" : "bg-accent/15 border border-accent/20") flex items-center justify-center shrink-0">
+                                    <span class="text-sm font-extrabold @(msg.IsRead ? "text-brand/40" : "text-accent")">@msg.Name.Substring(0, 1).ToUpperInvariant()</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-semibold text-white">@msg.Name</span>
+                                        @if (!msg.IsRead)
+                                        {
+                                            <span class="text-[9px] font-bold bg-accent text-navy-deep px-2 py-0.5 rounded-full uppercase tracking-wide">New</span>
+                                        }
+                                    </div>
+                                    <span class="text-xs text-brand/40 font-mono">@msg.Email</span>
+                                </div>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <span class="text-xs text-brand/30 font-mono">@msg.SentAt.ToLocalTime().ToString("MMM dd · HH:mm")</span>
+                                    @if (!msg.IsRead)
+                                    {
+                                        <form method="post" action="/Admin/MarkMessageRead/@msg.Id" class="inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="text-[10px] font-bold text-accent/70 hover:text-accent border border-accent/20 hover:border-accent/40 px-2.5 py-1 rounded-lg transition-all">
+                                                Mark Read
+                                            </button>
+                                        </form>
+                                    }
+                                    <form method="post" action="/Admin/DeleteMessage/@msg.Id" class="inline" onsubmit="return confirm('Delete this message?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="text-[10px] font-bold text-brand/30 hover:text-red-400 border border-white/5 hover:border-red-400/20 px-2.5 py-1 rounded-lg transition-all">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Subject & Body -->
+                            <div class="px-6 py-4">
+                                <p class="text-xs font-bold text-brand/50 uppercase tracking-wider mb-2">@msg.Subject</p>
+                                <p class="text-sm text-brand/70 leading-relaxed">@msg.MessageBody</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

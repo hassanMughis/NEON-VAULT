@@ -41,5 +41,30 @@ namespace Neon_vault.Controllers
             }
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Contact(string name, string email, string subject, string message)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(message))
+            {
+                return BadRequest();
+            }
+
+            var contact = new ContactMessage
+            {
+                Name = name.Trim(),
+                Email = email.Trim(),
+                Subject = string.IsNullOrWhiteSpace(subject) ? "(no subject)" : subject.Trim(),
+                MessageBody = message.Trim(),
+                SentAt = DateTime.UtcNow,
+                IsRead = false
+            };
+
+            _db.ContactMessages.Add(contact);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
     }
 }

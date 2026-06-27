@@ -19,7 +19,11 @@ namespace Neon_vault.Data
         public DbSet<ChatUser> ChatUsers => Set<ChatUser>();
         public DbSet<Channel> Channels => Set<Channel>();
         public DbSet<Message> Messages => Set<Message>();
+<<<<<<< HEAD
         public DbSet<Complaint> Complaints => Set<Complaint>();
+=======
+        public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+>>>>>>> 5291c96788f5d017a43d13184380421a7440a124
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
