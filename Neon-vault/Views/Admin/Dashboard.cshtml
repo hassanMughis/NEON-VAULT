@@ -7,73 +7,141 @@
     var recentOrders = ViewBag.RecentOrders as List<Neon_vault.Models.Order> ?? new List<Neon_vault.Models.Order>();
 }
 
+@section Styles {
+<style>
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stat-card { animation: fadeInUp 0.4s ease both; }
+    .stat-card:nth-child(2) { animation-delay: 0.08s; }
+    .stat-card:nth-child(3) { animation-delay: 0.16s; }
+    .table-row { transition: background 0.12s; }
+    .table-row:hover { background: rgba(221,183,255,0.03); }
+</style>
+}
+
 <div class="flex min-h-screen">
-    <!-- Admin Sidebar -->
     @await Html.PartialAsync("_AdminSidebar", "Dashboard")
 
-    <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto">
-        <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-navy/50 sticky top-0 z-50">
-            <h1 class="font-outfit text-lg font-bold text-white">Dashboard</h1>
-            <a href="/Admin/Logout" class="text-xs text-brand/40 hover:text-red-400 transition">Logout →</a>
+    <div class="flex-1 overflow-y-auto bg-[#07101F]">
+        <!-- Header -->
+        <header class="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-navy-deep/80 backdrop-blur sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-1 h-5 rounded-full bg-accent shadow-[0_0_8px_rgba(221,183,255,0.7)]"></div>
+                <h1 class="font-sora text-base font-bold text-white">Dashboard Overview</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-brand/30 font-mono">@DateTime.Now.ToString("MMM dd, yyyy · HH:mm")</span>
+                <a href="/Admin/Logout" class="text-xs text-brand/30 hover:text-red-400 transition-colors flex items-center gap-1.5">
+                    <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                    Logout
+                </a>
+            </div>
         </header>
 
-        <div class="p-6">
-            <!-- Metrics -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div class="bg-navy border border-slate-800/50 rounded-xl p-5">
-                    <span class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Games</span>
-                    <div class="text-2xl font-extrabold text-white font-sora mt-2">@totalGames</div>
+        <div class="p-8 space-y-8">
+            @if (TempData["Message"] != null)
+            {
+                <div class="flex items-center gap-3 bg-accent/10 border border-accent/25 text-accent text-sm px-5 py-3 rounded-xl">
+                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    @TempData["Message"]
                 </div>
-                <div class="bg-navy border border-slate-800/50 rounded-xl p-5">
-                    <span class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Orders</span>
-                    <div class="text-2xl font-extrabold text-white font-sora mt-2">@totalOrders</div>
+            }
+
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <!-- Games -->
+                <div class="stat-card relative overflow-hidden bg-navy border border-white/5 rounded-2xl p-6 group hover:border-accent/20 transition-all duration-200">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none"></div>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 fill-blue-400" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5S14.67 12 15.5 12s1.5.67 1.5 1.5S16.33 15 15.5 15zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 10 18.5 10s1.5.67 1.5 1.5S19.33 12 18.5 12z"/></svg>
+                        </div>
+                        <a href="/Admin/Games" class="text-[10px] text-brand/30 hover:text-accent transition-colors font-semibold tracking-wide">VIEW ALL →</a>
+                    </div>
+                    <div class="font-sora text-4xl font-extrabold text-white mb-1">@totalGames</div>
+                    <div class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Games</div>
                 </div>
-                <div class="bg-navy border border-slate-800/50 rounded-xl p-5">
-                    <span class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Revenue</span>
-                    <div class="text-2xl font-extrabold text-accent font-sora mt-2">$@totalRevenue.ToString("F2")</div>
+
+                <!-- Orders -->
+                <div class="stat-card relative overflow-hidden bg-navy border border-white/5 rounded-2xl p-6 group hover:border-accent/20 transition-all duration-200">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none"></div>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 fill-purple-400" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        </div>
+                        <a href="/Admin/Orders" class="text-[10px] text-brand/30 hover:text-accent transition-colors font-semibold tracking-wide">VIEW ALL →</a>
+                    </div>
+                    <div class="font-sora text-4xl font-extrabold text-white mb-1">@totalOrders</div>
+                    <div class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Orders</div>
+                </div>
+
+                <!-- Revenue -->
+                <div class="stat-card relative overflow-hidden bg-navy border border-white/5 rounded-2xl p-6 group hover:border-accent/20 transition-all duration-200">
+                    <div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent pointer-events-none"></div>
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 fill-accent" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                        </div>
+                    </div>
+                    <div class="font-sora text-4xl font-extrabold text-accent mb-1">$@totalRevenue.ToString("F0")</div>
+                    <div class="text-xs text-brand/40 font-semibold uppercase tracking-wider">Total Revenue</div>
                 </div>
             </div>
 
-            @if (TempData["Message"] != null)
-            {
-                <div class="bg-accent/10 border border-accent/30 text-accent text-sm px-4 py-2 rounded-lg mb-4">@TempData["Message"]</div>
-            }
-
-            <!-- Recent Orders -->
-            <div class="bg-navy border border-slate-800/50 rounded-xl p-6">
-                <div class="flex items-center justify-between mb-5">
-                    <h2 class="font-outfit text-base font-bold text-white">📋 Recent Orders</h2>
-                    <a href="/Admin/Orders" class="text-xs text-accent hover:underline">View All →</a>
+            <!-- Recent Orders Table -->
+            <div class="bg-navy border border-white/5 rounded-2xl overflow-hidden">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-1 h-4 rounded-full bg-accent/60"></div>
+                        <h2 class="font-outfit font-bold text-sm text-white">Recent Orders</h2>
+                    </div>
+                    <a href="/Admin/Orders" class="text-[11px] font-semibold text-accent/70 hover:text-accent transition-colors tracking-wide">VIEW ALL →</a>
                 </div>
+
                 @if (!recentOrders.Any())
                 {
-                    <p class="text-sm text-brand/40 text-center py-8">No orders yet.</p>
+                    <div class="flex flex-col items-center justify-center py-16 gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center">
+                            <svg class="w-6 h-6 fill-brand/30" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        </div>
+                        <p class="text-sm text-brand/30 font-semibold">No orders yet</p>
+                    </div>
                 }
                 else
                 {
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
+                        <table class="w-full">
                             <thead>
-                                <tr class="border-b border-slate-800/50">
-                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Order ID</th>
-                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Customer</th>
-                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Items</th>
-                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Amount</th>
-                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Date</th>
-                                    <th class="text-left text-[10px] text-brand/40 uppercase tracking-wider font-semibold py-3 px-4">Action</th>
+                                <tr class="border-b border-white/5 bg-white/[0.015]">
+                                    <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3 px-6">Order ID</th>
+                                    <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3 px-4">Customer</th>
+                                    <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3 px-4">Items</th>
+                                    <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3 px-4">Amount</th>
+                                    <th class="text-left text-[10px] text-brand/30 uppercase tracking-[1.5px] font-bold py-3 px-4">Date</th>
+                                    <th class="py-3 px-4"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var order in recentOrders)
                                 {
-                                    <tr class="border-b border-slate-800/20 hover:bg-white/[0.02] transition">
-                                        <td class="py-3 px-4 text-xs font-mono text-accent">#@order.Id.ToString().Substring(0, 8).ToUpper()</td>
-                                        <td class="py-3 px-4 text-xs text-white font-semibold">@order.CustomerName</td>
-                                        <td class="py-3 px-4 text-xs text-brand/60">@order.OrderItems.Count game(s)</td>
-                                        <td class="py-3 px-4 text-xs text-white font-semibold">$@order.TotalAmount.ToString("F2")</td>
-                                        <td class="py-3 px-4 text-xs text-brand/60">@order.OrderDate.ToString("MMM dd, HH:mm")</td>
-                                        <td class="py-3 px-4"><a href="/Admin/OrderDetails/@order.Id" class="text-xs text-accent hover:underline">View →</a></td>
+                                    <tr class="table-row border-b border-white/[0.04] last:border-0">
+                                        <td class="py-3.5 px-6">
+                                            <span class="font-mono text-xs text-accent bg-accent/10 px-2 py-0.5 rounded-md">#@order.Id.ToString().Substring(0, 8).ToUpper()</span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-sm text-white font-semibold">@order.CustomerName</td>
+                                        <td class="py-3.5 px-4">
+                                            <span class="text-xs text-brand/50 bg-white/5 px-2.5 py-1 rounded-lg font-semibold">@order.OrderItems.Count game(s)</span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-sm font-bold text-white">$@order.TotalAmount.ToString("F2")</td>
+                                        <td class="py-3.5 px-4 text-xs text-brand/40 font-mono">@order.OrderDate.ToString("MMM dd · HH:mm")</td>
+                                        <td class="py-3.5 px-4">
+                                            <a href="/Admin/OrderDetails/@order.Id" class="inline-flex items-center gap-1 text-xs font-semibold text-accent/70 hover:text-accent transition-colors">
+                                                View
+                                                <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                                            </a>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

@@ -269,6 +269,37 @@ namespace Neon_vault.Controllers
             return RedirectToAction("Games");
         }
 
+        // ── Contact Messages ─────────────────────────────────────────
+
+        public async Task<IActionResult> Messages()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login");
+            var messages = await _db.ContactMessages
+                .OrderByDescending(m => m.SentAt)
+                .ToListAsync();
+            return View(messages);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkMessageRead(int id)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login");
+            var msg = await _db.ContactMessages.FindAsync(id);
+            if (msg != null) { msg.IsRead = true; await _db.SaveChangesAsync(); }
+            return RedirectToAction("Messages");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteMessage(int id)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login");
+            var msg = await _db.ContactMessages.FindAsync(id);
+            if (msg != null) { _db.ContactMessages.Remove(msg); await _db.SaveChangesAsync(); }
+            return RedirectToAction("Messages");
+        }
+
         // ── Helper ──────────────────────────────────────────────────
 
         private bool IsAdmin()
